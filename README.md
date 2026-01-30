@@ -4,7 +4,29 @@
 
 Configurer Ruff pour détecter automatiquement les problèmes de code.
 
-## 🤔 Qu'est-ce que le linting ?
+## Installation des dépendances
+
+```bash
+# Avec UV (recommandé) - installe aussi ruff en dev dependency
+uv sync
+
+# Ou méthode classique
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+```
+
+## Utilisation de Ruff
+
+```bash
+# Avec UV
+uv run ruff check src/
+uv run ruff check --fix src/
+
+# Ou si venv activé
+ruff check src/
+ruff check --fix src/
+```
+
+## Qu'est-ce que le linting ?
 
 Le **linting** est l'analyse statique du code pour détecter :
 - 🐛 **Erreurs** : Variables non utilisées, imports manquants
