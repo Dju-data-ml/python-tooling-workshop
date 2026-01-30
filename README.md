@@ -1,131 +1,172 @@
-# Python Tooling Workshop
+# Step 01: Structure de projet Python
 
-Workshop pratique pour maîtriser les outils et bonnes pratiques Python en production.
+## Objectif
 
-## Vue d'ensemble
+Apprendre à organiser un projet Python de manière modulaire et maintenable.
 
-Ce workshop vous guide étape par étape dans la création d'un **Task Manager CLI** en Python, en appliquant les meilleures pratiques de développement professionnel.
-
-### Ce que vous allez apprendre
-
-- Structurer un projet Python modulaire
-- Gérer les dépendances avec `venv` et `requirements.txt`
-- Utiliser le linting et le formatage automatique (Ruff)
-- Appliquer un workflow Git professionnel avec branches
-- Créer une CLI interactive avec Rich et Click
-- Écrire des tests unitaires avec pytest
-
-## Structure du workshop
-
-Le projet est organisé en **branches progressives**. Chaque branche représente une étape du développement :
+## Structure créée
 
 ```
-main                    → Point de départ (ce README)
-  ↓
-step-01-structure       → Structure de projet Python
-  ↓
-step-02-dependencies    → Environnements virtuels et dépendances
-  ↓
-step-03-implementation  → Code fonctionnel (classes POO)
-  ↓
-step-04-linting         → Linting avec Ruff
-  ↓
-step-05-formatting      → Formatage automatique
-  ↓
-step-06-git-workflow    → Workflow Git avec branches et PR
-  ↓
-step-07-cli             → Interface CLI avec Rich/Click
-  ↓
-step-08-tests           → Tests unitaires avec pytest
+python-tooling-workshop/
+├── README.md              # Documentation principale
+├── .gitignore            # Fichiers à ignorer par Git
+├── src/                  # Code source de l'application
+│   ├── __init__.py       # Fait de src un package Python
+│   ├── models/           # Modèles de données (classes métier)
+│   │   └── __init__.py
+│   ├── services/         # Logique métier et services
+│   │   └── __init__.py
+│   └── cli/             # Interface en ligne de commande
+│       └── __init__.py
+└── tests/               # Tests unitaires et d'intégration
+    └── __init__.py
 ```
 
-## Démarrage rapide
+## Concepts clés
 
-### Option 1: GitHub Codespaces (Recommandé)
+### Architecture en couches
 
-1. Cliquez sur "Code" → "Codespaces" → "Create codespace"
-2. Attendez que l'environnement soit prêt (2-3 minutes)
-3. Vous avez VSCode dans votre navigateur avec tout configuré
+Le projet est organisé en couches logiques :
 
-### Option 2: Local
+1. **models/** : Les structures de données (classes `Task`, enums, etc.)
+   - Aucune logique métier complexe
+   - Juste la représentation des données
 
-**Prérequis:**
-- Python 3.10+
-- Git
-- VSCode (recommandé)
+2. **services/** : La logique métier
+   - Opérations CRUD sur les tasks
+   - Règles de gestion
+   - Validation
 
-**Installation:**
+3. **cli/** : L'interface utilisateur
+   - Interaction avec le terminal
+   - Affichage des résultats
+   - Parsing des commandes
+
+### Le fichier `__init__.py`
+
+Ce fichier (même vide) transforme un dossier en **package Python**.
+
+**Sans `__init__.py`:**
+```python
+# ❌ Ne fonctionne pas
+from models.task import Task
+```
+
+**Avec `__init__.py`:**
+```python
+# ✅ Fonctionne
+from src.models.task import Task
+```
+
+### Pourquoi `src/` ?
+
+- Évite les conflits de noms avec les packages installés
+- Structure claire : tout le code source est dans `src/`
+- Facilite l'installation du package plus tard
+- Convention moderne en Python
+
+### Le dossier `tests/`
+
+- Miroir de la structure `src/`
+- Un fichier de test par module : `test_task.py`, `test_task_manager.py`
+- Convention : préfixer les tests par `test_`
+
+## À reproduire
+
+### 1. Créer la structure de dossiers
+
 ```bash
-# Cloner le repo
-git clone https://github.com/[username]/python-tooling-workshop.git
-cd python-tooling-workshop
-
-# Créer un environnement virtuel
-python -m venv .venv
-source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
-
-# Installer les dépendances (après checkout d'une branche avec requirements.txt)
-pip install -r requirements.txt
+mkdir -p src/models src/services src/cli tests
 ```
 
-## Guide d'utilisation
-
-### Naviguer entre les étapes
+### 2. Créer les fichiers `__init__.py`
 
 ```bash
-# Voir toutes les branches disponibles
-git branch -a
-
-# Passer à une étape spécifique
-git checkout step-01-structure
-
-# Voir les différences entre deux étapes
-git diff step-01-structure..step-02-dependencies
+touch src/__init__.py
+touch src/models/__init__.py
+touch src/services/__init__.py
+touch src/cli/__init__.py
+touch tests/__init__.py
 ```
 
-### Workflow recommandé
+**Astuce:** Ces fichiers peuvent rester vides pour l'instant.
 
-1. **Checkout** de la branche de l'étape
-2. **Lire** le README de cette étape
-3. **Reproduire** le code dans votre propre branche
-4. **Tester** que ça fonctionne
-5. **Commit** vos changements
-6. **Passer** à l'étape suivante
+### 3. Vérifier la structure
 
-## Pour les formateurs
+```bash
+tree -I '__pycache__|.git|.venv'
+```
 
-### Structure pédagogique
+Vous devriez voir :
+```
+.
+├── README.md
+├── .gitignore
+├── src
+│   ├── __init__.py
+│   ├── cli
+│   │   └── __init__.py
+│   ├── models
+│   │   └── __init__.py
+│   └── services
+│       └── __init__.py
+└── tests
+    └── __init__.py
+```
 
-- **Durée totale:** 2h30
-- **Format:** Démonstration → Pratique → Validation
-- **Rythme:** 15-20 min par étape
+### 4. Premier commit
 
-### Plan détaillé
+```bash
+git add .
+git commit -m "feat: setup project structure"
+```
 
-Voir [masterclass_plan.md](./docs/masterclass_plan.md) pour le contenu de chaque phase.
+## Points de validation
 
-## Technologies utilisées
+- [ ] Tous les dossiers sont créés
+- [ ] Chaque package Python a son `__init__.py`
+- [ ] La structure est commité dans Git
+- [ ] Vous comprenez le rôle de chaque dossier
 
-- **Python 3.10+** - Langage de programmation
-- **Rich** - Affichage stylé dans le terminal
-- **Click** - Framework pour créer des CLI
-- **Ruff** - Linter et formatteur ultra-rapide
-- **pytest** - Framework de tests
-- **Git** - Gestion de versions
+## Aller plus loin
 
-## Ressources
+### Variantes de structure
 
-- [Documentation Ruff](https://docs.astral.sh/ruff/)
-- [Guide pytest](https://docs.pytest.org/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Real Python - Project Structure](https://realpython.com/python-application-layouts/)
+Il existe d'autres conventions :
 
-## Contribution
+**Structure "flat"** (petits projets) :
+```
+project/
+├── task.py
+├── task_manager.py
+└── main.py
+```
 
-Ce projet est un support pédagogique. Les suggestions d'amélioration sont les bienvenues via issues ou PR !
+**Structure "src layout"** (ce qu'on utilise) :
+```
+project/
+├── src/
+│   └── package/
+└── tests/
+```
 
-## Licence
+**Structure "application"** (très gros projets) :
+```
+project/
+├── src/
+│   ├── domain/
+│   ├── application/
+│   ├── infrastructure/
+│   └── presentation/
+```
 
-MIT - Libre d'utilisation pour l'éducation et la formation.
+Pour ce workshop, on utilise le "src layout" car c'est :
+- Un bon équilibre clarté/complexité
+- Préparation à Docker et packaging
+- Standard dans l'industrie
 
-**Bon workshop !**
+## Prochaine étape
+
+→ **Step 02: Environnements virtuels et dépendances**
+
+Vous allez apprendre à isoler vos dépendances Python avec `venv`.
