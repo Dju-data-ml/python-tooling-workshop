@@ -84,7 +84,7 @@ Notre Task Manager utilise deux bibliothèques :
 uv sync
 
 # Vérifier l'installation
-uv run python -c "from rich.console import Console; Console().print('[green]OK![/green]')"
+uv run python -c 'from rich.console import Console; Console().print("[green]OK![/green]")'
 ```
 
 ### Avec venv + pip (méthode classique)
