@@ -1,6 +1,8 @@
 """Task manager service for managing tasks."""
 
+import json
 from datetime import datetime
+from pathlib import Path
 from typing import List, Optional
 
 from src.models.task import Task, TaskStatus
@@ -18,6 +20,8 @@ class TaskManager:
         """Initialize the task manager with an empty task list."""
         self._tasks: List[Task] = []
         self._next_id: int = 1
+        self._file_path = Path("tasks.json")
+        self._load_tasks()
 
     def add_task(self, title: str, description: str) -> Task:
         """
@@ -39,6 +43,7 @@ class TaskManager:
         )
         self._tasks.append(task)
         self._next_id += 1
+        self._save_tasks()
         return task
 
     def get_task(self, task_id: int) -> Optional[Task]:
@@ -121,3 +126,37 @@ class TaskManager:
             Number of tasks with the given status
         """
         return len([task for task in self._tasks if task.status == status])
+
+    def _load_tasks(self) -> None:
+        """Load tasks from JSON file if it exists."""
+        if self._file_path.exists():
+            try:
+                with open(self._file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    for task_data in data:
+                        task = Task(
+                            id=task_data['id'],
+                            title=task_data['title'],
+                            description=task_data['description'],
+                            status=TaskStatus(task_data['status']),
+                            created_at=datetime.fromisoformat(task_data['created_at'])
+                        )
+                        self._tasks.append(task)
+                        self._next_id = max(self._next_id, task.id + 1)
+            except (json.JSONDecodeError, KeyError, ValueError):
+                # If file is corrupted, start fresh
+                pass
+
+    def _save_tasks(self) -> None:
+        """Save tasks to JSON file."""
+        data = []
+        for task in self._tasks:
+            data.append({
+                'id': task.id,
+                'title': task.title,
+                'description': task.description,
+                'status': task.status.value,
+                'created_at': task.created_at.isoformat()
+            })
+        with open(self._file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)

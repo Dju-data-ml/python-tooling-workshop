@@ -14,17 +14,6 @@ uv sync
 python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 ```
 
-## Exécuter la CLI
-
-```bash
-# Avec UV
-uv run python -m src.cli.main add "Ma tâche" "Description"
-uv run python -m src.cli.main list
-
-# Ou si venv activé
-python -m src.cli.main add "Ma tâche" "Description"
-python -m src.cli.main list
-```
 
 ## Architecture finale
 
@@ -49,22 +38,20 @@ Les deux travaillent ensemble :
 - Click structure la commande (`add`, `list`, etc.)
 - Rich rend l'affichage beau et lisible
 
-## CLI à implémenter
-
-### Commandes de base
+## Commandes de la CLI
 
 ```bash
 # Ajouter une tâche
-python -m src.cli.main add "Apprendre Python" "Compléter le workshop"
+uv run python -m src.cli.main add "Apprendre Python" "Compléter le workshop"
 
 # Lister toutes les tâches
-python -m src.cli.main list
+uv run python -m src.cli.main list
 
 # Marquer une tâche comme terminée
-python -m src.cli.main done 1
+uv run python -m src.cli.main done 1
 
 # Supprimer une tâche
-python -m src.cli.main delete 1
+uv run python -m src.cli.main delete 1
 ```
 
 ### Structure du code (cli/main.py)
@@ -125,23 +112,35 @@ touch src/cli/main.py
 - `done` : Marquer comme terminée
 - `delete` : Supprimer une tâche
 
-### 3. Tester l'interface
+### 3. Persistance automatique
+
+**Les tâches sont sauvegardées automatiquement dans `tasks.json` !**
+
+Vos tâches persistent entre les exécutions grâce à la sauvegarde JSON.
+
+### 4. Tester l'interface
 
 ```bash
-# Activer le venv
-source .venv/bin/activate
+# Ajouter une tâche
+uv run python -m src.cli.main add "Apprendre Python" "Compléter le workshop"
 
-# Tester les commandes
-python -m src.cli.main add "Test task" "Description"
-python -m src.cli.main list
+# Lister - la tâche est toujours là !
+uv run python -m src.cli.main list
+
+# Ajouter une autre tâche
+uv run python -m src.cli.main add "Build API" "Créer une API REST"
+
+# Lister à nouveau - les deux tâches sont là
+uv run python -m src.cli.main list
 ```
 
-### 4. Améliorations optionnelles
+### 5. Améliorations optionnelles
 
 - Filtrage par statut
 - Recherche dans les titres
-- Export vers JSON
+- Export vers JSON/CSV
 - Commandes d'aide détaillées
+- Mode interactif
 
 ## Points de validation
 
