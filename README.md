@@ -4,7 +4,29 @@
 
 Uniformiser automatiquement le style de code avec le formatteur Ruff.
 
-## 🎨 Linting vs Formatting
+## Installation des dépendances
+
+```bash
+# Avec UV (recommandé)
+uv sync
+
+# Ou méthode classique
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+```
+
+## Utilisation de Ruff Format
+
+```bash
+# Avec UV
+uv run ruff format .
+uv run ruff format src/
+
+# Ou si venv activé
+ruff format .
+ruff format src/
+```
+
+## Linting vs Formatting
 
 | Aspect | Linting | Formatting |
 |--------|---------|------------|
