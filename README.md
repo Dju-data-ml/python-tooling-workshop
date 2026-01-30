@@ -1,4 +1,4 @@
-# 🚀 Python Tooling Workshop
+# Python Tooling Workshop
 
 Workshop pratique pour maîtriser les outils et bonnes pratiques Python en production.
 
@@ -6,16 +6,16 @@ Workshop pratique pour maîtriser les outils et bonnes pratiques Python en produ
 
 Ce workshop vous guide étape par étape dans la création d'un **Task Manager CLI** en Python, en appliquant les meilleures pratiques de développement professionnel.
 
-### 🎯 Ce que vous allez apprendre
+### Ce que vous allez apprendre
 
-- ✅ Structurer un projet Python modulaire
-- ✅ Gérer les dépendances avec `venv` et `requirements.txt`
-- ✅ Utiliser le linting et le formatage automatique (Ruff)
-- ✅ Appliquer un workflow Git professionnel avec branches
-- ✅ Créer une CLI interactive avec Rich et Click
-- ✅ Écrire des tests unitaires avec pytest
+- Structurer un projet Python modulaire
+- Gérer les dépendances avec `venv` et `requirements.txt`
+- Utiliser le linting et le formatage automatique (Ruff)
+- Appliquer un workflow Git professionnel avec branches
+- Créer une CLI interactive avec Rich et Click
+- Écrire des tests unitaires avec pytest
 
-## 🏗️ Structure du workshop
+## Structure du workshop
 
 Le projet est organisé en **branches progressives**. Chaque branche représente une étape du développement :
 
@@ -39,13 +39,13 @@ step-07-cli             → Interface CLI avec Rich/Click
 step-08-tests           → Tests unitaires avec pytest
 ```
 
-## 🚀 Démarrage rapide
+## Démarrage rapide
 
 ### Option 1: GitHub Codespaces (Recommandé)
 
-1. Cliquez sur le bouton "Code" → "Codespaces" → "Create codespace"
+1. Cliquez sur le "Code" → "Codespaces" → "Create codespace"
 2. Attendez que l'environnement soit prêt (2-3 minutes)
-3. Vous avez VSCode dans votre navigateur avec tout configuré ! 🎉
+3. Vous avez VSCode dans votre navigateur avec tout configuré 
 
 ### Option 2: Local
 
@@ -92,7 +92,7 @@ git diff step-01-structure..step-02-dependencies
 5. **Commit** vos changements
 6. **Passer** à l'étape suivante
 
-## 🎓 Pour les formateurs
+## Pour les formateurs
 
 ### Structure pédagogique
 
@@ -102,9 +102,9 @@ git diff step-01-structure..step-02-dependencies
 
 ### Plan détaillé
 
-Voir [masterclass_plan.md](./masterclass_plan.md) pour le timing et le contenu de chaque phase.
+Voir [../docs/masterclass_plan.md](./../docs/masterclass_plan.md) pour le timing et le contenu de chaque phase.
 
-## 🛠️ Technologies utilisées
+## Technologies utilisées
 
 - **Python 3.10+** - Langage de programmation
 - **Rich** - Affichage stylé dans le terminal
@@ -113,21 +113,21 @@ Voir [masterclass_plan.md](./masterclass_plan.md) pour le timing et le contenu d
 - **pytest** - Framework de tests
 - **Git** - Gestion de versions
 
-## 📚 Ressources
+## Ressources
 
 - [Documentation Ruff](https://docs.astral.sh/ruff/)
 - [Guide pytest](https://docs.pytest.org/)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Real Python - Project Structure](https://realpython.com/python-application-layouts/)
 
-## 🤝 Contribution
+## Contribution
 
 Ce projet est un support pédagogique. Les suggestions d'amélioration sont les bienvenues via issues ou PR !
 
-## 📝 Licence
+## Licence
 
 MIT - Libre d'utilisation pour l'éducation et la formation.
 
 ---
 
-**Bon workshop ! 🎉**
+**Bon workshop **
