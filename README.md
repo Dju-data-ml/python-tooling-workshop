@@ -41,28 +41,42 @@ class Task:
 ```
 
 **Pourquoi `@dataclass` ?**
-- ✅ Génère automatiquement `__init__`, `__repr__`, `__eq__`
-- ✅ Type hints intégrés
-- ✅ Moins de code boilerplate
-- ✅ Immutabilité optionnelle avec `frozen=True`
 
-**Équivalent sans dataclass :**
+Imaginez que vous voulez créer une classe pour représenter une personne :
+
+**Sans `@dataclass` (la longue méthode) :**
 ```python
-class Task:
-    def __init__(self, id, title, description, status, created_at):
-        self.id = id
-        self.title = title
-        self.description = description
-        self.status = status
-        self.created_at = created_at
+class Person:
+    def __init__(self, name: str, age: int):
+        self.name = name
+        self.age = age
     
     def __repr__(self):
-        return f"Task(id={self.id}, title={self.title}, ...)"
+        return f"Person(name={self.name}, age={self.age})"
     
-    # ... etc
+    def __eq__(self, other):
+        if not isinstance(other, Person):
+            return False
+        return self.name == other.name and self.age == other.age
 ```
 
-Beaucoup plus verbeux !
+**Avec `@dataclass` (la méthode simple) :**
+```python
+@dataclass
+class Person:
+    name: str
+    age: int
+```
+
+**Ce que `@dataclass` fait automatiquement :**
+- ✅ Crée le constructeur `__init__` pour vous
+- ✅ Crée une représentation lisible `__repr__` 
+- ✅ Crée la comparaison `__eq__` (pour savoir si deux objets sont identiques)
+- ✅ Ajoute les types pour aider l'éditeur de code
+- ✅ Évite d'écrire du code répétitif
+- ✅ Optionnel : peut rendre l'objet non-modifiable avec `frozen=True`
+
+**Résultat :** Moins de code à écrire, moins d'erreurs, et plus facile à lire !
 
 ### Utilisation d'Enum
 
