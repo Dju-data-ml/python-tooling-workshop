@@ -1,133 +1,411 @@
-# Python Tooling Workshop
+# Step 04: Linting avec Ruff
 
-Workshop pratique pour maîtriser les outils et bonnes pratiques Python en production.
+## Objectif
 
-## 📚 Vue d'ensemble
+Configurer Ruff pour détecter automatiquement les problèmes de code.
 
-Ce workshop vous guide étape par étape dans la création d'un **Task Manager CLI** en Python, en appliquant les meilleures pratiques de développement professionnel.
+## 🤔 Qu'est-ce que le linting ?
 
-### Ce que vous allez apprendre
+Le **linting** est l'analyse statique du code pour détecter :
+- 🐛 **Erreurs** : Variables non utilisées, imports manquants
+- ⚠️ **Warnings** : Code suspect, mauvaises pratiques
+- 📏 **Style** : Non-respect des conventions PEP 8
+- 🧹 **Code smell** : Code complexe, redondant
 
-- Structurer un projet Python modulaire
-- Gérer les dépendances avec `venv` et `requirements.txt`
-- Utiliser le linting et le formatage automatique (Ruff)
-- Appliquer un workflow Git professionnel avec branches
-- Créer une CLI interactive avec Rich et Click
-- Écrire des tests unitaires avec pytest
+**Différence avec les tests :**
+- Tests : Vérifient que le code **fait** ce qu'il doit faire
+- Linting : Vérifie que le code est **écrit** correctement
 
-## Structure du workshop
+## 🚀 Pourquoi Ruff ?
 
-Le projet est organisé en **branches progressives**. Chaque branche représente une étape du développement :
+### Comparaison des outils
 
+| Outil | Vitesse | Fonctionnalités | Popularité |
+|-------|---------|-----------------|------------|
+| **Ruff** | 🚀🚀🚀 Ultra-rapide (Rust) | Linting + Formatting | ⭐ Montant |
+| Flake8 | 🐌 Lent (Python) | Linting uniquement | ⭐⭐⭐ Établi |
+| Pylint | 🐌🐌 Très lent | Très complet mais lourd | ⭐⭐ Ancien |
+| Black | 🚀 Rapide | Formatting uniquement | ⭐⭐⭐ Standard |
+
+**Notre choix : Ruff**
+- ✅ 10-100x plus rapide que les alternatives
+- ✅ Remplace Flake8 + isort + plusieurs plugins
+- ✅ Compatible avec Black
+- ✅ Auto-fix intégré
+- ✅ Utilisé par des projets majeurs (FastAPI, Pydantic...)
+
+## 📝 Configuration (pyproject.toml)
+
+### Structure du fichier
+
+```toml
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", ...]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
 ```
-main                    → Point de départ (ce README)
-  ↓
-step-01-structure       → Structure de projet Python
-  ↓
-step-02-dependencies    → Environnements virtuels et dépendances
-  ↓
-step-03-implementation  → Code fonctionnel (classes POO)
-  ↓
-step-04-linting         → Linting avec Ruff
-  ↓
-step-05-formatting      → Formatage automatique
-  ↓
-step-06-git-workflow    → Workflow Git avec branches et PR
-  ↓
-step-07-cli             → Interface CLI avec Rich/Click
-  ↓
-step-08-tests           → Tests unitaires avec pytest
+
+### Sections principales
+
+#### 1. Configuration générale
+
+```toml
+[tool.ruff]
+line-length = 100        # Longueur max des lignes
+target-version = "py310"  # Version Python cible
 ```
 
-## Démarrage rapide
+**Pourquoi 100 caractères ?**
+- Compromis entre lisibilité et productivité
+- PEP 8 suggère 79, mais trop strict pour le code moderne
+- Black (le formatteur standard) utilise 88
+- 100 est un bon équilibre
 
-### Option 1: GitHub Codespaces (Recommandé)
+#### 2. Règles de linting
 
-1. Cliquez sur le "Code" → "Codespaces" → "Create codespace"
-2. Attendez que l'environnement soit prêt (2-3 minutes)
-3. Vous avez VSCode dans votre navigateur avec tout configuré 
+```toml
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+]
+```
 
-### Option 2: Local
+**Catégories de règles :**
 
-**Prérequis:**
-- Python 3.10+
-- Git
-- VSCode (recommandé)
+| Code | Nom | Exemples de détection |
+|------|-----|------------------------|
+| **E** | pycodestyle errors | Espaces, indentation, lignes vides |
+| **W** | pycodestyle warnings | Imports inutiles, trailing whitespace |
+| **F** | pyflakes | Variables non utilisées, imports redondants |
+| **I** | isort | Ordre des imports |
+| **N** | pep8-naming | Noms de variables/fonctions/classes |
+| **UP** | pyupgrade | Syntaxe obsolète (ex: `List[str]` → `list[str]`) |
+| **B** | flake8-bugbear | Bugs classiques Python |
+| **SIM** | flake8-simplify | Code simplifiable |
 
-**Installation:**
+#### 3. Règles ignorées
+
+```toml
+ignore = [
+    "E501",  # Line too long (géré par le formatteur)
+]
+```
+
+Certaines règles sont redondantes avec le formatteur.
+
+#### 4. Exceptions par fichier
+
+```toml
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Autoriser imports non utilisés
+```
+
+Les `__init__.py` réexportent souvent des imports.
+
+## 🏗️ Utilisation
+
+### Installation
+
 ```bash
-# Cloner le repo
-git clone https://github.com/[username]/python-tooling-workshop.git
-cd python-tooling-workshop
-
-# Créer un environnement virtuel
-python -m venv .venv
-source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
-
-# Installer les dépendances (après checkout d'une branche avec requirements.txt)
-pip install -r requirements.txt
+pip install ruff
 ```
 
-## 📖 Guide d'utilisation
-
-### Naviguer entre les étapes
+### Vérifier le code
 
 ```bash
-# Voir toutes les branches disponibles
-git branch -a
+# Linter tout le projet
+ruff check .
 
-# Passer à une étape spécifique
-git checkout step-01-structure
+# Linter un dossier spécifique
+ruff check src/
 
-# Voir les différences entre deux étapes
-git diff step-01-structure..step-02-dependencies
+# Linter un fichier
+ruff check src/models/task.py
 ```
 
-### Workflow recommandé
+### Auto-fix
 
-1. **Checkout** de la branche de l'étape
-2. **Lire** le README de cette étape
-3. **Reproduire** le code dans votre propre branche
-4. **Tester** que ça fonctionne
-5. **Commit** vos changements
-6. **Passer** à l'étape suivante
+```bash
+# Corriger automatiquement ce qui est possible
+ruff check --fix src/
 
-## Pour les formateurs
+# Voir ce qui serait corrigé sans modifier
+ruff check --fix --diff src/
+```
 
-### Structure pédagogique
+### Afficher les règles violées
 
-- **Durée totale:** 2h30
-- **Format:** Démonstration → Pratique → Validation
-- **Rythme:** 15-20 min par étape
+```bash
+# Mode verbeux avec explication
+ruff check --output-format=full src/
 
-### Plan détaillé
+# Avec liens vers la doc des règles
+ruff check --output-format=github src/
+```
 
-Voir [../docs/masterclass_plan.md](./../docs/masterclass_plan.md) pour le timing et le contenu de chaque phase.
+## 🐛 Exemples de détection
 
-## Technologies utilisées
+### 1. Variable non utilisée (F841)
 
-- **Python 3.10+** - Langage de programmation
-- **Rich** - Affichage stylé dans le terminal
-- **Click** - Framework pour créer des CLI
-- **Ruff** - Linter et formatteur ultra-rapide
-- **pytest** - Framework de tests
-- **Git** - Gestion de versions
+```python
+# ❌ Avant
+def add_task(title, description):
+    task_id = generate_id()  # Variable jamais utilisée !
+    return create_task(title, description)
+```
 
-## Ressources
+```bash
+$ ruff check
+src/services/task_manager.py:5:5: F841 Local variable `task_id` is assigned to but never used
+```
+
+**Fix :**
+```python
+# ✅ Après
+def add_task(title, description):
+    return create_task(title, description)
+```
+
+### 2. Import non utilisé (F401)
+
+```python
+# ❌ Avant
+from datetime import datetime, timedelta  # timedelta pas utilisé
+from typing import List
+
+def get_tasks() -> List:
+    ...
+```
+
+```bash
+$ ruff check --fix src/
+- from datetime import datetime, timedelta
++ from datetime import datetime
+```
+
+### 3. Ordre des imports (I001)
+
+```python
+# Avant
+from src.models.task import Task
+from datetime import datetime
+import os
+```
+
+Ruff auto-fixe :
+```python
+# ✅ Après
+import os
+from datetime import datetime
+
+from src.models.task import Task
+```
+
+**Ordre standard :**
+1. Bibliothèque standard (`os`, `sys`...)
+2. Bibliothèques tierces (`click`, `rich`...)
+3. Imports locaux (`src.models`...)
+
+### 4. Naming conventions (N802, N806)
+
+```python
+# ❌ Avant
+def AddTask(Title):  # Fonctions en snake_case, pas PascalCase
+    TaskID = 1       # Variables en snake_case
+    return TaskID
+
+# ✅ Après
+def add_task(title):
+    task_id = 1
+    return task_id
+```
+
+### 5. Code simplifiable (SIM)
+
+```python
+# ❌ Avant
+if status == TaskStatus.TODO:
+    return True
+else:
+    return False
+
+# ✅ Après (SIM103)
+return status == TaskStatus.TODO
+```
+
+## 🎨 Intégration VSCode
+
+### Installation de l'extension
+
+1. Installer l'extension "Ruff" dans VSCode
+2. Ajouter à `.vscode/settings.json` :
+
+```json
+{
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true,
+      "source.organizeImports": true
+    }
+  },
+  "ruff.lint.enable": true
+}
+```
+
+**Résultat :**
+- 🔴 Erreurs soulignées en temps réel
+- 💡 Quick fixes disponibles (Ctrl+.)
+- ✨ Auto-fix à la sauvegarde
+
+## 🚦 CI/CD (aperçu)
+
+Au Sprint 6, on ajoutera Ruff dans la pipeline GitLab :
+
+```yaml
+# .gitlab-ci.yml (aperçu)
+lint:
+  script:
+    - pip install ruff
+    - ruff check src/
+  allow_failure: false  # Bloque le merge si erreurs
+```
+
+## ✅ Exercice pratique
+
+### 1. Installer Ruff
+
+```bash
+pip install ruff
+```
+
+### 2. Créer un fichier avec des erreurs
+
+Créez `bad_code.py` :
+
+```python
+import sys
+from datetime import datetime, timedelta
+from src.models.task import Task
+
+def AddTask(Title, Description):
+    unused_var = "hello"
+    TaskID = 1
+    if TaskID == 1:
+        return True
+    else:
+        return False
+```
+
+### 3. Lancer Ruff
+
+```bash
+ruff check bad_code.py
+```
+
+Vous devriez voir plusieurs erreurs !
+
+### 4. Auto-fix
+
+```bash
+ruff check --fix bad_code.py
+```
+
+Comparez le fichier avant/après.
+
+### 5. Vérifier votre vrai code
+
+```bash
+ruff check src/
+```
+
+Si tout est propre : 🎉 Bravo !
+
+Sinon : corrigez les erreurs (manuellement ou avec `--fix`).
+
+## 🎓 Règles avancées
+
+### Détecter du code bugbear (B)
+
+```python
+# ❌ B006: Mutable default argument
+def add_tags(task, tags=[]):  # Dangereux !
+    tags.append("new")
+    return tags
+
+# ✅ Correct
+def add_tags(task, tags=None):
+    if tags is None:
+        tags = []
+    tags.append("new")
+    return tags
+```
+
+### Simplifications (SIM)
+
+```python
+# ❌ SIM110: Use all()
+found = True
+for item in items:
+    if not item.valid:
+        found = False
+        break
+
+# ✅ Plus Pythonic
+found = all(item.valid for item in items)
+```
+
+## 📚 Ressources
 
 - [Documentation Ruff](https://docs.astral.sh/ruff/)
-- [Guide pytest](https://docs.pytest.org/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Real Python - Project Structure](https://realpython.com/python-application-layouts/)
+- [Liste des règles](https://docs.astral.sh/ruff/rules/)
+- [Configuration guide](https://docs.astral.sh/ruff/configuration/)
 
-## Contribution
+## Points de validation
 
-Ce projet est un support pédagogique. Les suggestions d'amélioration sont les bienvenues via issues ou PR !
+- [ ] `pyproject.toml` créé avec config Ruff
+- [ ] Ruff installé dans le venv
+- [ ] `ruff check src/` passe sans erreurs
+- [ ] Extension VSCode installée (optionnel)
+- [ ] Vous comprenez les principales catégories de règles
 
-## Licence
+## 💡 Astuces
 
-MIT - Libre d'utilisation pour l'éducation et la formation.
+**Ignorer une ligne spécifique :**
+```python
+import something_weird  # noqa: F401
+```
 
----
+**Ignorer un fichier entier :**
+Ajoutez dans `pyproject.toml` :
+```toml
+extend-exclude = ["old_code.py"]
+```
 
-**Bon workshop **
+**Voir toutes les règles actives :**
+```bash
+ruff rule --all
+```
+
+## 💾 Commit
+
+```bash
+git add pyproject.toml requirements.txt
+git commit -m "chore: add ruff linting configuration"
+```
+
+## Prochaine étape
+
+→ **Step 05: Formatage automatique**
+
+Vous allez utiliser Ruff comme formatteur pour uniformiser le style du code.
