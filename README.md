@@ -47,11 +47,19 @@ uv run python -m src.cli.main add "Apprendre Python" "Compléter le workshop"
 # Lister toutes les tâches
 uv run python -m src.cli.main list
 
-# Marquer une tâche comme terminée
-uv run python -m src.cli.main done 1
+# Lister les tâches par statut
+uv run python -m src.cli.main list --status todo
+uv run python -m src.cli.main list --status done
+
+# Mettre à jour le statut d'une tâche
+uv run python -m src.cli.main update 1 done
+uv run python -m src.cli.main update 1 in_progress
 
 # Supprimer une tâche
 uv run python -m src.cli.main delete 1
+
+# Voir les statistiques
+uv run python -m src.cli.main stats
 ```
 
 ### Structure du code (cli/main.py)
@@ -108,9 +116,10 @@ touch src/cli/main.py
 ### 2. Implémenter les commandes de base
 
 - `add` : Ajouter une tâche
-- `list` : Lister les tâches avec un tableau Rich
-- `done` : Marquer comme terminée
+- `list` : Lister les tâches (avec filtrage par statut)
+- `update` : Mettre à jour le statut d'une tâche
 - `delete` : Supprimer une tâche
+- `stats` : Afficher les statistiques
 
 ### 3. Persistance automatique
 
