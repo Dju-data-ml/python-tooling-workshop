@@ -91,6 +91,7 @@ class TaskManager:
             return False
 
         self._tasks.remove(task)
+        self._save_tasks()
         return True
 
     def update_task_status(self, task_id: int, status: TaskStatus) -> Optional[Task]:
@@ -109,6 +110,7 @@ class TaskManager:
             return None
 
         task.status = status
+        self._save_tasks()
         return task
 
     def count_tasks(self) -> int:
