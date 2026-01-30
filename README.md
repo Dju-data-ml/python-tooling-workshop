@@ -1,133 +1,326 @@
-# Python Tooling Workshop
+# Step 06: Workflow Git professionnel
 
-Workshop pratique pour maîtriser les outils et bonnes pratiques Python en production.
+## Objectif
 
-## 📚 Vue d'ensemble
+Apprendre à utiliser Git avec un workflow de branches et pull requests.
 
-Ce workshop vous guide étape par étape dans la création d'un **Task Manager CLI** en Python, en appliquant les meilleures pratiques de développement professionnel.
+## 🌳 Git branching strategy
 
-### Ce que vous allez apprendre
-
-- Structurer un projet Python modulaire
-- Gérer les dépendances avec `venv` et `requirements.txt`
-- Utiliser le linting et le formatage automatique (Ruff)
-- Appliquer un workflow Git professionnel avec branches
-- Créer une CLI interactive avec Rich et Click
-- Écrire des tests unitaires avec pytest
-
-## Structure du workshop
-
-Le projet est organisé en **branches progressives**. Chaque branche représente une étape du développement :
+### Le problème sans branches
 
 ```
-main                    → Point de départ (ce README)
-  ↓
-step-01-structure       → Structure de projet Python
-  ↓
-step-02-dependencies    → Environnements virtuels et dépendances
-  ↓
-step-03-implementation  → Code fonctionnel (classes POO)
-  ↓
-step-04-linting         → Linting avec Ruff
-  ↓
-step-05-formatting      → Formatage automatique
-  ↓
-step-06-git-workflow    → Workflow Git avec branches et PR
-  ↓
-step-07-cli             → Interface CLI avec Rich/Click
-  ↓
-step-08-tests           → Tests unitaires avec pytest
+main → commit → commit → commit → commit
+       (OK)    (OK)    (BUG!)  (FIX)
 ```
 
-## Démarrage rapide
+❌ Si un bug est introduit, difficile de revenir en arrière
+❌ Plusieurs personnes ne peuvent pas travailler en parallèle
+❌ Pas de review avant intégration
 
-### Option 1: GitHub Codespaces (Recommandé)
+### La solution : Feature branches
 
-1. Cliquez sur le "Code" → "Codespaces" → "Create codespace"
-2. Attendez que l'environnement soit prêt (2-3 minutes)
-3. Vous avez VSCode dans votre navigateur avec tout configuré 
-
-### Option 2: Local
-
-**Prérequis:**
-- Python 3.10+
-- Git
-- VSCode (recommandé)
-
-**Installation:**
-```bash
-# Cloner le repo
-git clone https://github.com/[username]/python-tooling-workshop.git
-cd python-tooling-workshop
-
-# Créer un environnement virtuel
-python -m venv .venv
-source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
-
-# Installer les dépendances (après checkout d'une branche avec requirements.txt)
-pip install -r requirements.txt
+```
+main  → commit A ────────────→ merge feature
+                   ↖           ↗
+feature branch      commit B → commit C
+                    (develop) (review)
 ```
 
-## 📖 Guide d'utilisation
+✅ Développement isolé
+✅ main reste toujours stable
+✅ Review avant merge
 
-### Naviguer entre les étapes
+## 🔄 Workflow classique
+
+### 1. Créer une branche
 
 ```bash
-# Voir toutes les branches disponibles
-git branch -a
+# Depuis main
+git checkout main
+git pull origin main  # Être à jour
 
-# Passer à une étape spécifique
-git checkout step-01-structure
-
-# Voir les différences entre deux étapes
-git diff step-01-structure..step-02-dependencies
+# Créer une nouvelle branche
+git checkout -b feature/add-delete-functionality
 ```
 
-### Workflow recommandé
+**Convention de nommage :**
+- `feature/` : Nouvelle fonctionnalité
+- `fix/` : Correction de bug
+- `refactor/` : Refactorisation
+- `docs/` : Documentation
+- `test/` : Ajout de tests
 
-1. **Checkout** de la branche de l'étape
-2. **Lire** le README de cette étape
-3. **Reproduire** le code dans votre propre branche
-4. **Tester** que ça fonctionne
-5. **Commit** vos changements
-6. **Passer** à l'étape suivante
+### 2. Développer la feature
 
-## Pour les formateurs
+```bash
+# Modifier des fichiers
+vim src/services/task_manager.py
 
-### Structure pédagogique
+# Voir les changements
+git status
+git diff
 
-- **Durée totale:** 2h30
-- **Format:** Démonstration → Pratique → Validation
-- **Rythme:** 15-20 min par étape
+# Stager les fichiers
+git add src/services/task_manager.py
 
-### Plan détaillé
+# Commit avec message conventionnel
+git commit -m "feat: add delete task functionality"
+```
 
-Voir [../docs/masterclass_plan.md](./../docs/masterclass_plan.md) pour le timing et le contenu de chaque phase.
+### 3. Pousser la branche
 
-## Technologies utilisées
+```bash
+git push origin feature/add-delete-functionality
+```
 
-- **Python 3.10+** - Langage de programmation
-- **Rich** - Affichage stylé dans le terminal
-- **Click** - Framework pour créer des CLI
-- **Ruff** - Linter et formatteur ultra-rapide
-- **pytest** - Framework de tests
-- **Git** - Gestion de versions
+### 4. Créer une Pull Request (PR)
 
-## Ressources
+Sur GitHub :
+1. Aller sur le repo
+2. Cliquer "Compare & pull request"
+3. Remplir titre et description
+4. Assigner un reviewer
+5. Créer la PR
 
-- [Documentation Ruff](https://docs.astral.sh/ruff/)
-- [Guide pytest](https://docs.pytest.org/)
+### 5. Review et merge
+
+- Reviewer commente le code
+- Développeur fait des corrections
+- Une fois approuvé : merge dans main
+- Supprimer la branche feature
+
+## ✍️ Conventional Commits
+
+Format standard pour les messages de commit :
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Types principaux
+
+| Type | Utilisation | Exemple |
+|------|-------------|---------|
+| **feat** | Nouvelle fonctionnalité | `feat: add task deletion` |
+| **fix** | Correction de bug | `fix: handle empty task list` |
+| **docs** | Documentation | `docs: update README with setup` |
+| **style** | Formatage (pas de changement logique) | `style: apply ruff formatting` |
+| **refactor** | Refactorisation | `refactor: extract validation logic` |
+| **test** | Ajout de tests | `test: add unit tests for TaskManager` |
+| **chore** | Tâches techniques | `chore: update dependencies` |
+| **perf** | Performance | `perf: optimize task search` |
+
+### Exemples concrets
+
+```bash
+# ✅ Bon
+git commit -m "feat: add filter tasks by status"
+git commit -m "fix: prevent duplicate task IDs"
+git commit -m "docs: add API documentation"
+
+# ❌ Mauvais
+git commit -m "changes"
+git commit -m "fix stuff"
+git commit -m "WIP"
+```
+
+### Avec scope (optionnel)
+
+```bash
+git commit -m "feat(cli): add color output to list command"
+git commit -m "fix(models): handle None in task creation"
+git commit -m "test(services): add TaskManager integration tests"
+```
+
+### Avantages
+
+- 📚 Historique Git lisible
+- 🤖 Génération automatique de changelog
+- 🔍 Recherche facilitée : `git log --grep="feat"`
+- 🎯 Compréhension rapide des changements
+
+## 🔧 Exercice pratique
+
+### Partie 1 : Créer une feature branch
+
+```bash
+# 1. Partir de main
+git checkout main
+
+# 2. Créer une branche pour ajouter une méthode
+git checkout -b feature/count-by-status
+
+# 3. Ajouter cette méthode dans TaskManager
+def get_statistics(self) -> dict:
+    """Get task statistics by status."""
+    return {
+        "total": self.count_tasks(),
+        "todo": self.count_by_status(TaskStatus.TODO),
+        "in_progress": self.count_by_status(TaskStatus.IN_PROGRESS),
+        "done": self.count_by_status(TaskStatus.DONE),
+    }
+
+# 4. Commit
+git add src/services/task_manager.py
+git commit -m "feat: add task statistics method"
+
+# 5. Push
+git push origin feature/count-by-status
+```
+
+### Partie 2 : Créer une Pull Request
+
+1. Aller sur GitHub
+2. Vous devriez voir "Compare & pull request"
+3. Titre : "Add task statistics method"
+4. Description :
+   ```markdown
+   ## Description
+   Adds a new method to get statistics about tasks grouped by status.
+   
+   ## Changes
+   - Added `get_statistics()` method to TaskManager
+   - Returns dict with total, todo, in_progress, and done counts
+   
+   ## Testing
+   - Tested manually in Python REPL
+   - Works as expected
+   ```
+5. Créer la PR
+
+### Partie 3 : Merge
+
+Une fois la PR approuvée (ou auto-appro si vous êtes seul) :
+```bash
+# Merger sur GitHub avec le bouton "Merge"
+# Puis localement :
+git checkout main
+git pull origin main
+git branch -d feature/count-by-status  # Supprimer la branche locale
+```
+
+## 🎨 Workflow visuel
+
+```
+1. main (à jour)
+   ↓
+2. git checkout -b feature/xyz
+   ↓
+3. [Développement + commits]
+   ↓
+4. git push origin feature/xyz
+   ↓
+5. [Créer PR sur GitHub]
+   ↓
+6. [Review + discussions]
+   ↓
+7. [Merge PR → main]
+   ↓
+8. git checkout main && git pull
+```
+
+## Bonnes pratiques
+
+### À faire
+
+- **Branches courtes :** Une feature = une branche
+- **Commits atomiques :** Un commit = un changement logique
+- **Messages clairs :** Suivre Conventional Commits
+- **Pull avant push :** Toujours sync avec main
+- **Review systématique :** Même pour vos propres projets (bon exercice)
+
+### ❌ À éviter
+
+- Commiter directement sur main
+- Branches qui vivent des semaines
+- Messages de commit vagues : "update", "fix", "changes"
+- Commits massifs (500+ lignes)
+- Ne jamais merge main dans votre branche feature
+
+## 🔀 Résoudre des conflits
+
+### Scénario
+
+```
+main:  A → B → C
+              ↘
+feature:       D → E
+```
+
+Si quelqu'un d'autre a merge quelque chose sur main pendant que vous travailliez :
+
+```bash
+# 1. Stasher vos changements non commités (si besoin)
+git stash
+
+# 2. Update main
+git checkout main
+git pull origin main
+
+# 3. Rebaser votre branche
+git checkout feature/xyz
+git rebase main
+
+# 4. Résoudre les conflits si nécessaires
+# Éditer les fichiers en conflit
+git add <fichiers_résolus>
+git rebase --continue
+
+# 5. Push (force nécessaire après rebase)
+git push origin feature/xyz --force-with-lease
+```
+
+**Alternativement : merge au lieu de rebase**
+```bash
+git checkout feature/xyz
+git merge main
+# Résoudre conflits
+git commit
+```
+
+**Rebase vs Merge :**
+- **Rebase :** Historique linéaire et propre (recommandé)
+- **Merge :** Préserve l'historique exact (parfois utile)
+
+## 🎓 GitFlow (aperçu)
+
+Pour de gros projets, on utilise souvent GitFlow :
+
+```
+main (production)
+  ↓
+develop (intégration)
+  ↓
+feature/xyz (développement)
+```
+
+Vous verrez ça au Sprint 6 de la formation !
+
+## Points de validation
+
+- [ ] Vous savez créer une branche
+- [ ] Vous suivez Conventional Commits
+- [ ] Vous avez créé au moins une PR
+- [ ] Vous comprenez le workflow branches → PR → merge
+
+## 📚 Ressources
+
 - [Conventional Commits](https://www.conventionalcommits.org/)
-- [Real Python - Project Structure](https://realpython.com/python-application-layouts/)
+- [GitHub Flow](https://guides.github.com/introduction/flow/)
+- [Git Branching Model](https://nvie.com/posts/a-successful-git-branching-model/)
 
-## Contribution
+## 💾 Commit
 
-Ce projet est un support pédagogique. Les suggestions d'amélioration sont les bienvenues via issues ou PR !
+Cette étape est particulière : c'est vous qui créez vos branches !
 
-## Licence
+Exercice : créez une branche avec une petite amélioration de votre choix et faites une PR.
 
-MIT - Libre d'utilisation pour l'éducation et la formation.
+## Prochaine étape
 
----
+→ **Step 07: CLI avec Rich et Click**
 
-**Bon workshop **
+Vous allez créer une vraie interface en ligne de commande interactive.
