@@ -1,133 +1,143 @@
-# Python Tooling Workshop
+# Step 07: CLI avec Rich et Click
 
-Workshop pratique pour maîtriser les outils et bonnes pratiques Python en production.
+## Objectif
 
-## 📚 Vue d'ensemble
+Créer une interface en ligne de commande interactive et professionnelle pour notre Task Manager.
 
-Ce workshop vous guide étape par étape dans la création d'un **Task Manager CLI** en Python, en appliquant les meilleures pratiques de développement professionnel.
-
-### Ce que vous allez apprendre
-
-- Structurer un projet Python modulaire
-- Gérer les dépendances avec `venv` et `requirements.txt`
-- Utiliser le linting et le formatage automatique (Ruff)
-- Appliquer un workflow Git professionnel avec branches
-- Créer une CLI interactive avec Rich et Click
-- Écrire des tests unitaires avec pytest
-
-## Structure du workshop
-
-Le projet est organisé en **branches progressives**. Chaque branche représente une étape du développement :
+## Architecture finale
 
 ```
-main                    → Point de départ (ce README)
-  ↓
-step-01-structure       → Structure de projet Python
-  ↓
-step-02-dependencies    → Environnements virtuels et dépendances
-  ↓
-step-03-implementation  → Code fonctionnel (classes POO)
-  ↓
-step-04-linting         → Linting avec Ruff
-  ↓
-step-05-formatting      → Formatage automatique
-  ↓
-step-06-git-workflow    → Workflow Git avec branches et PR
-  ↓
-step-07-cli             → Interface CLI avec Rich/Click
-  ↓
-step-08-tests           → Tests unitaires avec pytest
+src/
+├── models/
+│   └── task.py          # Modèle Task et TaskStatus
+├── services/
+│   └── task_manager.py  # Logique métier TaskManager
+└── cli/
+    └── main.py          # Interface CLI avec Rich/Click
 ```
 
-## Démarrage rapide
+## Rich vs Click
 
-### Option 1: GitHub Codespaces (Recommandé)
+| Composant | Rôle | Exemple |
+|-----------|------|---------|
+| **Rich** | Affichage stylé | Tableaux, couleurs, progress bars |
+| **Click** | Structure CLI | Commandes, arguments, options |
 
-1. Cliquez sur le "Code" → "Codespaces" → "Create codespace"
-2. Attendez que l'environnement soit prêt (2-3 minutes)
-3. Vous avez VSCode dans votre navigateur avec tout configuré 
+Les deux travaillent ensemble :
+- Click structure la commande (`add`, `list`, etc.)
+- Rich rend l'affichage beau et lisible
 
-### Option 2: Local
+## CLI à implémenter
 
-**Prérequis:**
-- Python 3.10+
-- Git
-- VSCode (recommandé)
-
-**Installation:**
-```bash
-# Cloner le repo
-git clone https://github.com/[username]/python-tooling-workshop.git
-cd python-tooling-workshop
-
-# Créer un environnement virtuel
-python -m venv .venv
-source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
-
-# Installer les dépendances (après checkout d'une branche avec requirements.txt)
-pip install -r requirements.txt
-```
-
-## 📖 Guide d'utilisation
-
-### Naviguer entre les étapes
+### Commandes de base
 
 ```bash
-# Voir toutes les branches disponibles
-git branch -a
+# Ajouter une tâche
+python -m src.cli.main add "Apprendre Python" "Compléter le workshop"
 
-# Passer à une étape spécifique
-git checkout step-01-structure
+# Lister toutes les tâches
+python -m src.cli.main list
 
-# Voir les différences entre deux étapes
-git diff step-01-structure..step-02-dependencies
+# Marquer une tâche comme terminée
+python -m src.cli.main done 1
+
+# Supprimer une tâche
+python -m src.cli.main delete 1
 ```
 
-### Workflow recommandé
+### Structure du code (cli/main.py)
 
-1. **Checkout** de la branche de l'étape
-2. **Lire** le README de cette étape
-3. **Reproduire** le code dans votre propre branche
-4. **Tester** que ça fonctionne
-5. **Commit** vos changements
-6. **Passer** à l'étape suivante
+```python
+import click
+from rich.console import Console
+from rich.table import Table
+from src.services.task_manager import TaskManager
 
-## Pour les formateurs
+console = Console()
+manager = TaskManager()
 
-### Structure pédagogique
+@click.group()
+def cli():
+    """Task Manager CLI"""
+    pass
 
-- **Durée totale:** 2h30
-- **Format:** Démonstration → Pratique → Validation
-- **Rythme:** 15-20 min par étape
+@cli.command()
+@click.argument('title')
+@click.argument('description')
+def add(title: str, description: str):
+    """Add a new task"""
+    task = manager.add_task(title, description)
+    console.print(f"[green]Task created:[/green] {task.title}")
 
-### Plan détaillé
+@cli.command()
+def list():
+    """List all tasks"""
+    tasks = manager.list_tasks()
+    
+    table = Table(title="Tasks")
+    table.add_column("ID", style="cyan")
+    table.add_column("Title", style="magenta")
+    table.add_column("Status", style="green")
+    
+    for task in tasks:
+        table.add_row(str(task.id), task.title, task.status.value)
+    
+    console.print(table)
 
-Voir [../docs/masterclass_plan.md](./../docs/masterclass_plan.md) pour le timing et le contenu de chaque phase.
+if __name__ == "__main__":
+    cli()
+```
 
-## Technologies utilisées
+## À reproduire
 
-- **Python 3.10+** - Langage de programmation
-- **Rich** - Affichage stylé dans le terminal
-- **Click** - Framework pour créer des CLI
-- **Ruff** - Linter et formatteur ultra-rapide
-- **pytest** - Framework de tests
-- **Git** - Gestion de versions
+### 1. Créer le fichier CLI
 
-## Ressources
+```bash
+touch src/cli/main.py
+```
 
-- [Documentation Ruff](https://docs.astral.sh/ruff/)
-- [Guide pytest](https://docs.pytest.org/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Real Python - Project Structure](https://realpython.com/python-application-layouts/)
+### 2. Implémenter les commandes de base
 
-## Contribution
+- `add` : Ajouter une tâche
+- `list` : Lister les tâches avec un tableau Rich
+- `done` : Marquer comme terminée
+- `delete` : Supprimer une tâche
 
-Ce projet est un support pédagogique. Les suggestions d'amélioration sont les bienvenues via issues ou PR !
+### 3. Tester l'interface
 
-## Licence
+```bash
+# Activer le venv
+source .venv/bin/activate
 
-MIT - Libre d'utilisation pour l'éducation et la formation.
+# Tester les commandes
+python -m src.cli.main add "Test task" "Description"
+python -m src.cli.main list
+```
 
----
+### 4. Améliorations optionnelles
 
-**Bon workshop **
+- Filtrage par statut
+- Recherche dans les titres
+- Export vers JSON
+- Commandes d'aide détaillées
+
+## Points de validation
+
+- [ ] `src/cli/main.py` créé avec structure Click
+- [ ] Commandes `add` et `list` fonctionnelles
+- [ ] Tableau Rich s'affiche correctement
+- [ ] CLI peut être lancée avec `python -m src.cli.main`
+- [ ] Messages d'erreur clairs
+
+## Commit
+
+```bash
+git add src/cli/main.py
+git commit -m "feat: add CLI interface with Rich and Click"
+```
+
+## Prochaine étape
+
+→ **Step 08: Tests unitaires avec pytest**
+
+Vous allez écrire des tests pour valider le fonctionnement de votre Task Manager.
