@@ -263,38 +263,131 @@ feature:       D → E
 
 Si quelqu'un d'autre a merge quelque chose sur main pendant que vous travailliez :
 
-```bash
-# 1. Stasher vos changements non commités (si besoin)
-git stash
+### 📊 Situation initiale
 
-# 2. Update main
+```
+main:     A ── B ── C
+                ↘
+feature:        D ── E
+```
+
+**Problème :** main a avancé avec le commit C, mais votre branche part de B.
+
+### Étape 1 : Mettre de côté vos changements
+
+```bash
+git stash
+```
+
+**Ce que ça fait :**
+```
+main:     A ── B ── C
+                ↘
+feature:        D ── E
+stash:           [vos changements non commités]
+```
+
+### Étape 2 : Mettre à jour main
+
+```bash
 git checkout main
 git pull origin main
+```
 
-# 3. Rebaser votre branche
+**Ce que ça fait :**
+```
+main:     A ── B ── C ── F  (F = nouveaux commits sur main)
+                ↘
+feature:        D ── E
+```
+
+### Étape 3 : Rebasé votre branche
+
+```bash
 git checkout feature/xyz
 git rebase main
+```
 
-# 4. Résoudre les conflits si nécessaires
-# Éditer les fichiers en conflit
-git add <fichiers_résolus>
+**Ce que ça fait :**
+```
+Avant rebase:
+main:     A ── B ── C ── F
+                ↘
+feature:        D ── E
+
+Après rebase:
+main:     A ── B ── C ── F
+                           ↘
+feature:                D' ── E'
+```
+
+**Explication simple :** Git prend vos commits D et E, les "décolle" de B, et les "recolle" après F.
+
+### Étape 4 : Résoudre les conflits (si nécessaire)
+
+```bash
+# Si Git dit : CONFLICT (content): Merge conflict in fichier.py
+# Éditez le fichier pour résoudre
+git add fichier.py
 git rebase --continue
+```
 
-# 5. Push (force nécessaire après rebase)
+**Exemple de conflit :**
+```python
+<<<<<<< HEAD  (version de main)
+def calculate_total(items):
+    return sum(items)
+=======
+def calculate_total(items, tax=0.2):  # votre version
+    return sum(items) * (1 + tax)
+>>>>>>> feature/xyz
+```
+
+**Résolution :**
+```python
+def calculate_total(items, tax=0.2):
+    return sum(items) * (1 + tax)
+```
+
+### Étape 5 : Récupérer vos changements et pousser
+
+```bash
+git stash pop  # Récupérer vos changements stashés
 git push origin feature/xyz --force-with-lease
 ```
 
-**Alternativement : merge au lieu de rebase**
+**Résultat final :**
+```
+main:     A ── B ── C ── F
+                           ↘
+feature:                D' ── E' ── [vos changements]
+```
+
+---
+
+### 🔄 Alternative : Merge (plus simple mais historique moins propre)
+
 ```bash
 git checkout feature/xyz
 git merge main
-# Résoudre conflits
-git commit
+```
+
+**Ce que ça fait :**
+```
+Avant merge:
+main:     A ── B ── C ── F
+                ↘
+feature:        D ── E
+
+Après merge:
+main:     A ── B ── C ── F
+                ↘
+feature:        D ── E ── M  (M = merge commit)
 ```
 
 **Rebase vs Merge :**
-- **Rebase :** Historique linéaire et propre (recommandé)
-- **Merge :** Préserve l'historique exact (parfois utile)
+- **Rebase :** Historique linéaire, plus propre à lire ✅
+- **Merge :** Historique exact, plus facile à comprendre ❌
 
 ## 🎓 GitFlow (aperçu)
 
