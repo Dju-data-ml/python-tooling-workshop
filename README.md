@@ -4,7 +4,17 @@
 
 Apprendre à utiliser Git avec un workflow de branches et pull requests.
 
-## 🌳 Git branching strategy
+## Installation des dépendances
+
+```bash
+# Avec UV (recommandé)
+uv sync
+
+# Ou méthode classique
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+```
+
+## Git branching strategy
 
 ### Le problème sans branches
 
