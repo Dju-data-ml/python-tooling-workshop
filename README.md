@@ -1,131 +1,347 @@
-# Python Tooling Workshop
+# Step 03: Implémentation des classes
 
-Workshop pratique pour maîtriser les outils et bonnes pratiques Python en production.
+## Objectif
 
-## Vue d'ensemble
+Implémenter les classes `Task` et `TaskManager` en appliquant les principes de la POO.
 
-Ce workshop vous guide étape par étape dans la création d'un **Task Manager CLI** en Python, en appliquant les meilleures pratiques de développement professionnel.
-
-### Ce que vous allez apprendre
-
-- Structurer un projet Python modulaire
-- Gérer les dépendances avec `venv` et `requirements.txt`
-- Utiliser le linting et le formatage automatique (Ruff)
-- Appliquer un workflow Git professionnel avec branches
-- Créer une CLI interactive avec Rich et Click
-- Écrire des tests unitaires avec pytest
-
-## Structure du workshop
-
-Le projet est organisé en **branches progressives**. Chaque branche représente une étape du développement :
+## Architecture
 
 ```
-main                    → Point de départ (ce README)
-  ↓
-step-01-structure       → Structure de projet Python
-  ↓
-step-02-dependencies    → Environnements virtuels et dépendances
-  ↓
-step-03-implementation  → Code fonctionnel (classes POO)
-  ↓
-step-04-linting         → Linting avec Ruff
-  ↓
-step-05-formatting      → Formatage automatique
-  ↓
-step-06-git-workflow    → Workflow Git avec branches et PR
-  ↓
-step-07-cli             → Interface CLI avec Rich/Click
-  ↓
-step-08-tests           → Tests unitaires avec pytest
+src/
+├── models/
+│   └── task.py          # Modèle de données Task
+└── services/
+    └── task_manager.py  # Logique métier TaskManager
 ```
 
-## Démarrage rapide
+## 📦 Classe Task (models/task.py)
 
-### Option 1: GitHub Codespaces (Recommandé)
+### Utilisation de dataclass
 
-1. Cliquez sur "Code" → "Codespaces" → "Create codespace"
-2. Attendez que l'environnement soit prêt (2-3 minutes)
-3. Vous avez VSCode dans votre navigateur avec tout configuré
+```python
+from dataclasses import dataclass
 
-### Option 2: Local
+@dataclass
+class Task:
+    id: int
+    title: str
+    description: str
+    status: TaskStatus
+    created_at: datetime
+```
 
-**Prérequis:**
-- Python 3.10+
-- Git
-- VSCode (recommandé)
+**Pourquoi `@dataclass` ?**
+- ✅ Génère automatiquement `__init__`, `__repr__`, `__eq__`
+- ✅ Type hints intégrés
+- ✅ Moins de code boilerplate
+- ✅ Immutabilité optionnelle avec `frozen=True`
 
-**Installation:**
+**Équivalent sans dataclass :**
+```python
+class Task:
+    def __init__(self, id, title, description, status, created_at):
+        self.id = id
+        self.title = title
+        self.description = description
+        self.status = status
+        self.created_at = created_at
+    
+    def __repr__(self):
+        return f"Task(id={self.id}, title={self.title}, ...)"
+    
+    # ... etc
+```
+
+Beaucoup plus verbeux !
+
+### Utilisation d'Enum
+
+```python
+class TaskStatus(Enum):
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    DONE = "done"
+```
+
+**Pourquoi une Enum ?**
+- ✅ Valeurs prédéfinies (pas de "typo" possible)
+- ✅ Autocomplétion dans l'IDE
+- ✅ Comparaison type-safe
+- ✅ Itération sur toutes les valeurs possibles
+
+**Mauvaise approche :**
+```python
+# ❌ Utiliser des strings directement
+status = "in_progress"  # Typo possible : "in_progres"
+```
+
+**Bonne approche :**
+```python
+# ✅ Utiliser l'Enum
+status = TaskStatus.IN_PROGRESS  # Autocomplétion + validation
+```
+
+### Méthodes métier
+
+```python
+def mark_done(self) -> None:
+    """Mark the task as completed."""
+    self.status = TaskStatus.DONE
+```
+
+**Principe :** Encapsuler la logique métier dans la classe.
+
+**Avantages :**
+- Le code qui utilise `Task` n'a pas besoin de connaître `TaskStatus`
+- On peut ajouter de la validation ou des effets de bord
+- API plus claire : `task.mark_done()` vs `task.status = TaskStatus.DONE`
+
+## 🔧 Classe TaskManager (services/task_manager.py)
+
+### Responsabilité unique
+
+Le `TaskManager` gère **une collection de tasks**.
+
+**Ce qu'il fait :**
+- ✅ CRUD sur les tasks (Create, Read, Update, Delete)
+- ✅ Génération d'IDs uniques
+- ✅ Filtrage par statut
+
+**Ce qu'il ne fait PAS :**
+- ❌ Affichage (rôle de la CLI)
+- ❌ Persistance fichier/BDD (rôle d'un Repository)
+- ❌ Validation complexe (rôle de la classe Task)
+
+### Gestion de la liste de tasks
+
+```python
+def __init__(self) -> None:
+    self._tasks: List[Task] = []  # Attribut privé
+    self._next_id: int = 1
+```
+
+**Pourquoi `_tasks` avec underscore ?**
+- Convention Python : attribut "privé" (pas réellement privé, mais signal)
+- Évite l'accès direct depuis l'extérieur
+- Force à passer par les méthodes publiques
+
+**Exemple d'utilisation correcte :**
+```python
+# ✅ Bon
+manager = TaskManager()
+tasks = manager.list_tasks()
+
+# ❌ Mauvais (mais techniquement possible)
+tasks = manager._tasks  # Brise l'encapsulation
+```
+
+### Type hints et Optional
+
+```python
+def get_task(self, task_id: int) -> Optional[Task]:
+    ...
+    return None  # Si pas trouvé
+```
+
+**`Optional[Task]` signifie :** "Retourne soit un `Task`, soit `None`"
+
+Équivalent à : `Task | None` (Python 3.10+)
+
+**Pourquoi c'est important ?**
+```python
+task = manager.get_task(999)
+if task is not None:
+    print(task.title)  # ✅ Safe, on a vérifié
+else:
+    print("Task not found")
+```
+
+Sans le type hint, l'IDE ne peut pas nous aider à détecter ce cas.
+
+### Méthodes de filtrage
+
+```python
+def list_tasks(self, status: Optional[TaskStatus] = None) -> List[Task]:
+    if status is None:
+        return self._tasks.copy()  # Toutes les tasks
+    
+    return [task for task in self._tasks if task.status == status]
+```
+
+**List comprehension :** Syntaxe Python concise pour filtrer/transformer.
+
+**Équivalent avec boucle classique :**
+```python
+result = []
+for task in self._tasks:
+    if task.status == status:
+        result.append(task)
+return result
+```
+
+## 🧪 Tester le code
+
+### En Python REPL
+
+```python
+# Lancer Python depuis la racine du projet
+python
+
+>>> from src.models.task import Task, TaskStatus
+>>> from src.services.task_manager import TaskManager
+>>> from datetime import datetime
+
+# Créer un manager
+>>> manager = TaskManager()
+
+# Ajouter des tasks
+>>> task1 = manager.add_task("Learn Python", "Complete the workshop")
+>>> task2 = manager.add_task("Build API", "Create FastAPI service")
+
+# Lister les tasks
+>>> tasks = manager.list_tasks()
+>>> for task in tasks:
+...     print(task)
+Task #1: Learn Python [todo]
+Task #2: Build API [todo]
+
+# Changer un statut
+>>> task1.mark_in_progress()
+>>> print(task1)
+Task #1: Learn Python [in_progress]
+
+# Filtrer par statut
+>>> in_progress = manager.list_tasks(TaskStatus.IN_PROGRESS)
+>>> print(len(in_progress))
+1
+
+# Supprimer une task
+>>> manager.delete_task(2)
+True
+>>> print(manager.count_tasks())
+1
+```
+
+### Script de test manuel
+
+Créez `test_manual.py` à la racine :
+
+```python
+from src.models.task import TaskStatus
+from src.services.task_manager import TaskManager
+
+# Créer un manager
+manager = TaskManager()
+
+# Ajouter quelques tasks
+print("📝 Adding tasks...")
+t1 = manager.add_task("Learn Python", "Complete tooling workshop")
+t2 = manager.add_task("Build API", "Create FastAPI service")
+t3 = manager.add_task("Deploy", "Deploy to production")
+
+print(f"✅ {manager.count_tasks()} tasks created")
+
+# Afficher toutes les tasks
+print("\n📋 All tasks:")
+for task in manager.list_tasks():
+    print(f"  - {task}")
+
+# Changer des statuts
+print("\n🔄 Updating statuses...")
+t1.mark_in_progress()
+t2.mark_done()
+
+# Afficher par statut
+print(f"\n✅ Done: {manager.count_by_status(TaskStatus.DONE)}")
+print(f"🚧 In Progress: {manager.count_by_status(TaskStatus.IN_PROGRESS)}")
+print(f"📌 Todo: {manager.count_by_status(TaskStatus.TODO)}")
+```
+
+Lancez-le :
 ```bash
-# Cloner le repo
-git clone https://github.com/[username]/python-tooling-workshop.git
-cd python-tooling-workshop
-
-# Créer un environnement virtuel
-python -m venv .venv
-source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
-
-# Installer les dépendances (après checkout d'une branche avec requirements.txt)
-pip install -r requirements.txt
+python test_manual.py
 ```
 
-## Guide d'utilisation
+## 💡 Concepts POO appliqués
 
-### Naviguer entre les étapes
+### Encapsulation
+- Données (`_tasks`) cachées derrière une API publique
+- Pas d'accès direct à la liste
+
+### Abstraction
+- Les utilisateurs du `TaskManager` ne voient que les méthodes publiques
+- L'implémentation interne (liste, dict, BDD...) peut changer
+
+### Cohésion
+- `Task` : Représenter une tâche
+- `TaskManager` : Gérer un ensemble de tâches
+- Chaque classe a une responsabilité claire
+
+### Composition
+- `TaskManager` **contient** des `Task` (relation has-a)
+- Pas d'héritage (relation is-a) car pas nécessaire ici
+
+## Points de validation
+
+- [ ] `task.py` créé avec `Task` et `TaskStatus`
+- [ ] `task_manager.py` créé avec `TaskManager`
+- [ ] Le code s'importe sans erreur
+- [ ] Test manuel dans REPL fonctionne
+- [ ] Vous comprenez le rôle de chaque classe
+
+## 📚 Pour aller plus loin
+
+### Type hints avancés
+
+```python
+from typing import Dict, Set, Tuple
+
+# Dict avec types pour clés et valeurs
+tasks_by_id: Dict[int, Task] = {}
+
+# Set d'IDs uniques
+completed_ids: Set[int] = {1, 3, 5}
+
+# Tuple de taille fixe
+stats: Tuple[int, int, int] = (5, 3, 2)  # (total, done, in_progress)
+```
+
+### Dataclass avancé
+
+```python
+from dataclasses import dataclass, field
+
+@dataclass
+class Task:
+    id: int
+    title: str
+    tags: List[str] = field(default_factory=list)  # Valeur par défaut mutable
+    frozen: bool = field(default=False, repr=False)  # Exclu du __repr__
+```
+
+### Property decorator
+
+```python
+class TaskManager:
+    @property
+    def total_tasks(self) -> int:
+        """Expose count as a read-only property."""
+        return len(self._tasks)
+
+# Utilisation
+manager = TaskManager()
+print(manager.total_tasks)  # Comme un attribut, mais c'est une méthode
+```
+
+## 💾 Commit
 
 ```bash
-# Voir toutes les branches disponibles
-git branch -a
-
-# Passer à une étape spécifique
-git checkout step-01-structure
-
-# Voir les différences entre deux étapes
-git diff step-01-structure..step-02-dependencies
+git add src/
+git commit -m "feat: implement Task and TaskManager classes"
 ```
 
-### Workflow recommandé
+## Prochaine étape
 
-1. **Checkout** de la branche de l'étape
-2. **Lire** le README de cette étape
-3. **Reproduire** le code dans votre propre branche
-4. **Tester** que ça fonctionne
-5. **Commit** vos changements
-6. **Passer** à l'étape suivante
+→ **Step 04: Linting avec Ruff**
 
-## Pour les formateurs
-
-### Structure pédagogique
-
-- **Durée totale:** 2h30
-- **Format:** Démonstration → Pratique → Validation
-- **Rythme:** 15-20 min par étape
-
-### Plan détaillé
-
-Voir [masterclass_plan.md](./docs/masterclass_plan.md) pour le contenu de chaque phase.
-
-## Technologies utilisées
-
-- **Python 3.10+** - Langage de programmation
-- **Rich** - Affichage stylé dans le terminal
-- **Click** - Framework pour créer des CLI
-- **Ruff** - Linter et formatteur ultra-rapide
-- **pytest** - Framework de tests
-- **Git** - Gestion de versions
-
-## Ressources
-
-- [Documentation Ruff](https://docs.astral.sh/ruff/)
-- [Guide pytest](https://docs.pytest.org/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Real Python - Project Structure](https://realpython.com/python-application-layouts/)
-
-## Contribution
-
-Ce projet est un support pédagogique. Les suggestions d'amélioration sont les bienvenues via issues ou PR !
-
-## Licence
-
-MIT - Libre d'utilisation pour l'éducation et la formation.
-
-**Bon workshop !**
+Vous allez configurer Ruff pour détecter automatiquement les problèmes dans le code.
