@@ -1,133 +1,344 @@
-# Python Tooling Workshop
+# Step 05: Formatage automatique avec Ruff
 
-Workshop pratique pour maîtriser les outils et bonnes pratiques Python en production.
+## Objectif
 
-## 📚 Vue d'ensemble
+Uniformiser automatiquement le style de code avec le formatteur Ruff.
 
-Ce workshop vous guide étape par étape dans la création d'un **Task Manager CLI** en Python, en appliquant les meilleures pratiques de développement professionnel.
+## 🎨 Linting vs Formatting
 
-### Ce que vous allez apprendre
+| Aspect | Linting | Formatting |
+|--------|---------|------------|
+| **Objectif** | Détecter les erreurs logiques | Uniformiser le style visuel |
+| **Exemples** | Variables non utilisées, imports manquants | Espaces, indentation, quotes |
+| **Action** | Signale des problèmes | Modifie le code automatiquement |
+| **Impact** | Peut affecter le comportement | N'affecte jamais le comportement |
 
-- Structurer un projet Python modulaire
-- Gérer les dépendances avec `venv` et `requirements.txt`
-- Utiliser le linting et le formatage automatique (Ruff)
-- Appliquer un workflow Git professionnel avec branches
-- Créer une CLI interactive avec Rich et Click
-- Écrire des tests unitaires avec pytest
+**En résumé :**
+- **Linting** : "Ton code a des problèmes" 🐛
+- **Formatting** : "Ton code est moche" ✨
 
-## Structure du workshop
+## 🚀 Utilisation de Ruff Format
 
-Le projet est organisé en **branches progressives**. Chaque branche représente une étape du développement :
-
-```
-main                    → Point de départ (ce README)
-  ↓
-step-01-structure       → Structure de projet Python
-  ↓
-step-02-dependencies    → Environnements virtuels et dépendances
-  ↓
-step-03-implementation  → Code fonctionnel (classes POO)
-  ↓
-step-04-linting         → Linting avec Ruff
-  ↓
-step-05-formatting      → Formatage automatique
-  ↓
-step-06-git-workflow    → Workflow Git avec branches et PR
-  ↓
-step-07-cli             → Interface CLI avec Rich/Click
-  ↓
-step-08-tests           → Tests unitaires avec pytest
-```
-
-## Démarrage rapide
-
-### Option 1: GitHub Codespaces (Recommandé)
-
-1. Cliquez sur le "Code" → "Codespaces" → "Create codespace"
-2. Attendez que l'environnement soit prêt (2-3 minutes)
-3. Vous avez VSCode dans votre navigateur avec tout configuré 
-
-### Option 2: Local
-
-**Prérequis:**
-- Python 3.10+
-- Git
-- VSCode (recommandé)
-
-**Installation:**
-```bash
-# Cloner le repo
-git clone https://github.com/[username]/python-tooling-workshop.git
-cd python-tooling-workshop
-
-# Créer un environnement virtuel
-python -m venv .venv
-source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
-
-# Installer les dépendances (après checkout d'une branche avec requirements.txt)
-pip install -r requirements.txt
-```
-
-## 📖 Guide d'utilisation
-
-### Naviguer entre les étapes
+### Formater du code
 
 ```bash
-# Voir toutes les branches disponibles
-git branch -a
+# Formater tout le projet
+ruff format .
 
-# Passer à une étape spécifique
-git checkout step-01-structure
+# Formater un dossier spécifique
+ruff format src/
 
-# Voir les différences entre deux étapes
-git diff step-01-structure..step-02-dependencies
+# Voir ce qui serait modifié sans changer
+ruff format --check src/
+
+# Afficher les différences
+ruff format --diff src/
 ```
 
-### Workflow recommandé
+### Différence avec Black
 
-1. **Checkout** de la branche de l'étape
-2. **Lire** le README de cette étape
-3. **Reproduire** le code dans votre propre branche
-4. **Tester** que ça fonctionne
-5. **Commit** vos changements
-6. **Passer** à l'étape suivante
+Ruff Format est compatible avec Black :
+- Même résultat de formatage
+- Mais 10-100x plus rapide
+- Configuration dans `pyproject.toml` (déjà fait au step 04)
 
-## Pour les formateurs
+## 📐 Règles de formatage
 
-### Structure pédagogique
+### 1. Longueur de ligne
 
-- **Durée totale:** 2h30
-- **Format:** Démonstration → Pratique → Validation
-- **Rythme:** 15-20 min par étape
+```python
+# ❌ Avant (> 100 caractères)
+def create_task(title, description, status, priority, tags, assignee, due_date, created_at, updated_at):
+    pass
 
-### Plan détaillé
+# ✅ Après
+def create_task(
+    title,
+    description,
+    status,
+    priority,
+    tags,
+    assignee,
+    due_date,
+    created_at,
+    updated_at,
+):
+    pass
+```
 
-Voir [../docs/masterclass_plan.md](./../docs/masterclass_plan.md) pour le timing et le contenu de chaque phase.
+### 2. Guillemets (quotes)
 
-## Technologies utilisées
+Configuration dans `pyproject.toml` :
+```toml
+[tool.ruff.format]
+quote-style = "double"  # " au lieu de '
+```
 
-- **Python 3.10+** - Langage de programmation
-- **Rich** - Affichage stylé dans le terminal
-- **Click** - Framework pour créer des CLI
-- **Ruff** - Linter et formatteur ultra-rapide
-- **pytest** - Framework de tests
-- **Git** - Gestion de versions
+```python
+# ❌ Avant
+task = 'Learn Python'
+status = 'todo'
 
-## Ressources
+# ✅ Après
+task = "Learn Python"
+status = "todo"
+```
 
-- [Documentation Ruff](https://docs.astral.sh/ruff/)
-- [Guide pytest](https://docs.pytest.org/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Real Python - Project Structure](https://realpython.com/python-application-layouts/)
+**Pourquoi double quotes ?**
+- Convention majoritaire en Python moderne
+- Évite les conflits avec apostrophes : `"don't"` vs `'don\'t'`
+- Cohérence avec JSON
 
-## Contribution
+### 3. Trailing commas
 
-Ce projet est un support pédagogique. Les suggestions d'amélioration sont les bienvenues via issues ou PR !
+```python
+# ❌ Avant
+tasks = [
+    task1,
+    task2
+]
 
-## Licence
+# ✅ Après
+tasks = [
+    task1,
+    task2,  # Trailing comma
+]
+```
 
-MIT - Libre d'utilisation pour l'éducation et la formation.
+**Avantages :**
+- Diffs Git plus propres
+- Facilite l'ajout d'éléments
+- Évite les erreurs de syntaxe
 
----
+### 4. Espaces autour des opérateurs
 
-**Bon workshop **
+```python
+# ❌ Avant
+result=a+b*c
+
+# ✅ Après
+result = a + b * c
+```
+
+### 5. Imports organisés
+
+Bien que géré par le linter, le formatteur respecte l'organisation :
+
+```python
+# ✅ Bon ordre et espacement
+import os
+import sys
+
+from datetime import datetime
+
+from src.models.task import Task
+```
+
+## Exercice pratique
+
+### 1. Créer un fichier mal formaté
+
+Créez `messy_code.py` :
+
+```python
+# Formatage inconsistant volontaire
+from src.models.task import Task,TaskStatus
+from datetime import datetime,timedelta
+import os,sys
+
+class   TaskService:
+    def __init__(self,manager):
+        self.manager=manager
+    
+    def process(self,task_id,force=False,verbose=True,retry_count=3,timeout=60):
+        tasks=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+        result={'status':'ok','count':len(tasks)}
+        return result
+```
+
+### 2. Vérifier les différences
+
+```bash
+ruff format --diff messy_code.py
+```
+
+Vous verrez tout ce qui va changer.
+
+### 3. Appliquer le formatage
+
+```bash
+ruff format messy_code.py
+```
+
+### 4. Comparer le résultat
+
+Le fichier devrait maintenant ressembler à :
+
+```python
+# Formatage cohérent et propre
+import os
+import sys
+from datetime import datetime, timedelta
+
+from src.models.task import Task, TaskStatus
+
+
+class TaskService:
+    def __init__(self, manager):
+        self.manager = manager
+
+    def process(
+        self,
+        task_id,
+        force=False,
+        verbose=True,
+        retry_count=3,
+        timeout=60,
+    ):
+        tasks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        result = {"status": "ok", "count": len(tasks)}
+        return result
+```
+
+### 5. Formater tout le projet
+
+```bash
+ruff format src/
+```
+
+## 🎯 Workflow recommandé
+
+### En développement
+
+1. **Écrire du code** (sans se soucier du formatage)
+2. **Sauvegarder** → Format automatique (si configuré dans VSCode)
+3. **Commit** après vérification
+
+### Avant un commit
+
+```bash
+# 1. Formater
+ruff format src/
+
+# 2. Linter
+ruff check src/
+
+# 3. Si tout est bon
+git add .
+git commit -m "feat: add new feature"
+```
+
+## ⚙️ Configuration VSCode
+
+Ajoutez à `.vscode/settings.json` :
+
+```json
+{
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true
+  }
+}
+```
+
+**Résultat :**
+- ✨ Formatage automatique à chaque sauvegarde
+- ✨ Formatage au collage de code
+- ✨ Zéro effort mental sur le style
+
+## 🔥 Pre-commit hook (avancé)
+
+Pour formater automatiquement avant chaque commit :
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.15
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+```
+
+Installation :
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+À chaque `git commit`, le code sera formaté et linté automatiquement.
+
+## 💡 Pourquoi le formatage automatique ?
+
+### Avantages
+
+1. **Zéro débat d'équipe**
+   - Fini les "tabs vs spaces"
+   - Fini les "simple vs double quotes"
+   - Le formatteur décide, point final
+
+2. **Code reviews plus efficaces**
+   - Focus sur la logique, pas le style
+   - Diffs Git minimalistes
+   - Pas de commentaires "ajoute un espace ici"
+
+3. **Productivité**
+   - Pas besoin de réfléchir au formatage
+   - Lecture de code plus rapide (style uniforme)
+   - Onboarding plus simple
+
+4. **Préparation à la prod**
+   - Style cohérent = code plus maintenable
+   - Facilite les outils d'analyse statique
+   - Standard dans l'industrie
+
+### Inconvénients ?
+
+- Perte de "liberté créative" → mais c'est le but !
+- Parfois le résultat n'est pas "optimal" → rare, et peu important
+
+## 📚 Comparaison des formatteurs Python
+
+| Outil | Vitesse | Personnalisation | Adoption |
+|-------|---------|------------------|----------|
+| **Ruff Format** | 🚀🚀🚀 | Limitée (volontaire) | 📈 Croissante |
+| Black | 🚀 | Presque aucune | ⭐⭐⭐ Standard |
+| autopep8 | 🐌 | Haute | ⭐⭐ Ancien |
+| YAPF | 🐌 | Très haute | ⭐ Niche |
+
+**Notre choix : Ruff Format**
+- Compatible Black (pas de migration)
+- Ultra-rapide (important sur gros projets)
+- Un seul outil pour linting + formatting
+
+## Points de validation
+
+- [ ] Vous avez formaté le code avec `ruff format`
+- [ ] Vous comprenez la différence linting/formatting
+- [ ] VSCode configuré pour format-on-save (optionnel)
+- [ ] Le code suit un style uniforme
+
+## 🎭 Philosophie du formatage
+
+> "Code is read much more often than it is written."
+> — Guido van Rossum, créateur de Python
+
+Le formatage automatique n'est pas une contrainte, c'est une libération :
+- Plus besoin de réfléchir au style
+- Plus d'énergie pour la logique métier
+- Équipe alignée par défaut
+
+## 💾 Commit
+
+```bash
+git add .
+git commit -m "style: apply ruff formatting to all code"
+```
+
+## Prochaine étape
+
+→ **Step 06: Workflow Git professionnel**
+
+Vous allez apprendre à travailler avec des branches et des pull requests.
