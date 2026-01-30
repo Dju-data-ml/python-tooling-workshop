@@ -69,12 +69,12 @@ class Person:
 ```
 
 **Ce que `@dataclass` fait automatiquement :**
-- ✅ Crée le constructeur `__init__` pour vous
-- ✅ Crée une représentation lisible `__repr__` 
-- ✅ Crée la comparaison `__eq__` (pour savoir si deux objets sont identiques)
-- ✅ Ajoute les types pour aider l'éditeur de code
-- ✅ Évite d'écrire du code répétitif
-- ✅ Optionnel : peut rendre l'objet non-modifiable avec `frozen=True`
+- Crée le constructeur `__init__` pour vous
+- Crée une représentation lisible `__repr__` 
+- Crée la comparaison `__eq__` (pour savoir si deux objets sont identiques)
+- Ajoute les types pour aider l'éditeur de code
+- Évite d'écrire du code répétitif
+- Optionnel : peut rendre l'objet non-modifiable avec `frozen=True`
 
 **Résultat :** Moins de code à écrire, moins d'erreurs, et plus facile à lire !
 
@@ -88,10 +88,10 @@ class TaskStatus(Enum):
 ```
 
 **Pourquoi une Enum ?**
-- ✅ Valeurs prédéfinies (pas de "typo" possible)
-- ✅ Autocomplétion dans l'IDE
-- ✅ Comparaison type-safe
-- ✅ Itération sur toutes les valeurs possibles
+- Valeurs prédéfinies (pas de "typo" possible)
+- Autocomplétion dans l'IDE
+- Comparaison type-safe
+- Itération sur toutes les valeurs possibles
 
 **Mauvaise approche :**
 ```python
@@ -127,9 +127,9 @@ def mark_done(self) -> None:
 Le `TaskManager` gère **une collection de tasks**.
 
 **Ce qu'il fait :**
-- ✅ CRUD sur les tasks (Create, Read, Update, Delete)
-- ✅ Génération d'IDs uniques
-- ✅ Filtrage par statut
+- CRUD sur les tasks (Create, Read, Update, Delete)
+- Génération d'IDs uniques
+- Filtrage par statut
 
 **Ce qu'il ne fait PAS :**
 - ❌ Affichage (rôle de la CLI)
