@@ -4,6 +4,28 @@
 
 Créer une interface en ligne de commande interactive et professionnelle pour notre Task Manager.
 
+## Installation des dépendances
+
+```bash
+# Avec UV (recommandé)
+uv sync
+
+# Ou méthode classique
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+```
+
+## Exécuter la CLI
+
+```bash
+# Avec UV
+uv run python -m src.cli.main add "Ma tâche" "Description"
+uv run python -m src.cli.main list
+
+# Ou si venv activé
+python -m src.cli.main add "Ma tâche" "Description"
+python -m src.cli.main list
+```
+
 ## Architecture finale
 
 ```
