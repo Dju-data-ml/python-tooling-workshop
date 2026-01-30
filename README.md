@@ -4,6 +4,33 @@
 
 Apprendre à gérer proprement les dépendances Python avec des environnements virtuels.
 
+## Installation des dépendances
+
+### Option 1: Avec UV (recommandé)
+
+[UV](https://docs.astral.sh/uv/) est un gestionnaire de packages Python ultra-rapide.
+
+```bash
+# Installer les dépendances (crée automatiquement le venv)
+uv sync
+```
+
+C'est tout ! UV crée l'environnement virtuel et installe les dépendances en quelques secondes.
+
+### Option 2: Méthode classique (venv + pip)
+
+```bash
+# Créer un environnement virtuel
+python -m venv .venv
+
+# Activer l'environnement
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\activate   # Windows
+
+# Installer les dépendances
+pip install -r requirements.txt
+```
+
 ## Pourquoi un environnement virtuel ?
 
 ### Le problème sans venv
@@ -50,7 +77,19 @@ Notre Task Manager utilise deux bibliothèques :
 
 ## À reproduire
 
-### 1. Créer un environnement virtuel
+### Avec UV (recommandé)
+
+```bash
+# Synchroniser l'environnement
+uv sync
+
+# Vérifier l'installation
+uv run python -c "from rich.console import Console; Console().print('[green]OK![/green]')"
+```
+
+### Avec venv + pip (méthode classique)
+
+#### 1. Créer un environnement virtuel
 
 ```bash
 python -m venv .venv
@@ -60,7 +99,7 @@ python -m venv .venv
 - `python -m venv` : module intégré à Python 3.3+
 - `.venv` : nom du dossier (convention, peut être `venv`, `env`, etc.)
 
-### 2. Activer l'environnement
+#### 2. Activer l'environnement
 
 **Sur Linux/Mac :**
 ```bash
@@ -78,7 +117,7 @@ Votre prompt devrait afficher `(.venv)` au début :
 (.venv) user@machine:~/project$
 ```
 
-### 3. Installer les dépendances
+#### 3. Installer les dépendances
 
 ```bash
 pip install -r requirements.txt
@@ -89,7 +128,7 @@ pip install -r requirements.txt
 - Télécharge les packages depuis PyPI
 - Les installe dans `.venv/lib/python3.x/site-packages/`
 
-### 4. Vérifier l'installation
+#### 4. Vérifier l'installation
 
 ```bash
 pip list
@@ -104,7 +143,7 @@ rich       13.7.0
 ...
 ```
 
-### 5. Tester Rich en Python
+### Tester Rich en Python
 
 ```python
 python
@@ -186,13 +225,22 @@ COPY src/ ./src/
 
 ## Concepts avancés
 
-### pyproject.toml (aperçu)
+### UV vs pip/venv
 
-Format moderne pour gérer les dépendances :
+| Aspect | UV | pip + venv |
+|--------|----|-----------|
+| **Vitesse** | 10-100x plus rapide | Standard |
+| **Commandes** | `uv sync` | 3 commandes |
+| **Lockfile** | `uv.lock` automatique | Manuel |
+| **Reproductibilité** | Garantie | Approximative |
+
+### pyproject.toml
+
+Format moderne pour gérer les dépendances (utilisé par UV) :
 
 ```toml
 [project]
-name = "task-manager"
+name = "python-tooling-workshop"
 version = "0.1.0"
 dependencies = [
     "rich>=13.7.0",
@@ -201,29 +249,21 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.3",
     "ruff>=0.1.9",
 ]
 ```
 
-Utilisé avec des outils comme Poetry, PDM, ou Hatch.
-
-**Pour ce workshop :** On reste sur `requirements.txt` (plus simple, universel).
-
 ### Alternatives à venv
 
+- **UV :** Ultra-rapide, moderne, recommandé
 - **virtualenv :** Ancêtre de venv, plus de fonctionnalités
 - **conda :** Environnements avec packages non-Python (NumPy, ML)
-- **pipenv :** Combine pip + venv
 - **poetry :** Gestion moderne de dépendances
-
-**Pour ce workshop :** `venv` est intégré à Python, suffisant pour 90% des cas.
 
 ## Points de validation
 
-- [ ] `.venv/` créé et activé
-- [ ] `requirements.txt` créé avec rich et click
-- [ ] Packages installés avec succès
+- [ ] Environnement créé (`uv sync` ou `python -m venv`)
+- [ ] Dépendances installées (rich et click)
 - [ ] Test d'import de Rich fonctionne
 - [ ] `.venv/` bien ignoré par Git
 
@@ -244,7 +284,7 @@ Vous devriez voir une progress bar !
 ## Commit
 
 ```bash
-git add requirements.txt STEP_02_README.md
+git add pyproject.toml uv.lock requirements.txt
 git commit -m "feat: add project dependencies (rich, click)"
 ```
 
