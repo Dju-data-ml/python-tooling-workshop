@@ -1,131 +1,257 @@
-# Python Tooling Workshop
+# Step 02: Environnements virtuels et dépendances
 
-Workshop pratique pour maîtriser les outils et bonnes pratiques Python en production.
+## Objectif
 
-## Vue d'ensemble
+Apprendre à gérer proprement les dépendances Python avec des environnements virtuels.
 
-Ce workshop vous guide étape par étape dans la création d'un **Task Manager CLI** en Python, en appliquant les meilleures pratiques de développement professionnel.
+## Pourquoi un environnement virtuel ?
 
-### Ce que vous allez apprendre
+### Le problème sans venv
 
-- Structurer un projet Python modulaire
-- Gérer les dépendances avec `venv` et `requirements.txt`
-- Utiliser le linting et le formatage automatique (Ruff)
-- Appliquer un workflow Git professionnel avec branches
-- Créer une CLI interactive avec Rich et Click
-- Écrire des tests unitaires avec pytest
-
-## Structure du workshop
-
-Le projet est organisé en **branches progressives**. Chaque branche représente une étape du développement :
-
+Imaginez ce scénario :
 ```
-main                    → Point de départ (ce README)
-  ↓
-step-01-structure       → Structure de projet Python
-  ↓
-step-02-dependencies    → Environnements virtuels et dépendances
-  ↓
-step-03-implementation  → Code fonctionnel (classes POO)
-  ↓
-step-04-linting         → Linting avec Ruff
-  ↓
-step-05-formatting      → Formatage automatique
-  ↓
-step-06-git-workflow    → Workflow Git avec branches et PR
-  ↓
-step-07-cli             → Interface CLI avec Rich/Click
-  ↓
-step-08-tests           → Tests unitaires avec pytest
+Projet A nécessite : requests==2.25.0
+Projet B nécessite : requests==2.31.0
 ```
 
-## Démarrage rapide
+Si vous installez les deux globalement :
+- ❌ Conflit de versions
+- ❌ Un projet va casser
+- ❌ Impossible de reproduire l'environnement
 
-### Option 1: GitHub Codespaces (Recommandé)
+### La solution : venv
 
-1. Cliquez sur "Code" → "Codespaces" → "Create codespace"
-2. Attendez que l'environnement soit prêt (2-3 minutes)
-3. Vous avez VSCode dans votre navigateur avec tout configuré
+Un **environnement virtuel** isole les dépendances de chaque projet :
+```
+/home/user/
+├── projet-a/
+│   └── .venv/  → requests 2.25.0
+└── projet-b/
+    └── .venv/  → requests 2.31.0
+```
 
-### Option 2: Local
+Pas de conflit
+Reproductibilité garantie
+Préparation à Docker
 
-**Prérequis:**
-- Python 3.10+
-- Git
-- VSCode (recommandé)
+## Dépendances du projet
 
-**Installation:**
+Notre Task Manager utilise deux bibliothèques :
+
+### Rich
+- **Rôle :** Affichage stylé dans le terminal
+- **Usage :** Tableaux, couleurs, progress bars
+- **Pourquoi :** Rendre la CLI professionnelle et agréable
+
+### Click
+- **Rôle :** Framework pour créer des CLI
+- **Usage :** Parsing des arguments, commandes, options
+- **Pourquoi :** Standard de facto pour les CLI Python
+
+## À reproduire
+
+### 1. Créer un environnement virtuel
+
 ```bash
-# Cloner le repo
-git clone https://github.com/[username]/python-tooling-workshop.git
-cd python-tooling-workshop
-
-# Créer un environnement virtuel
 python -m venv .venv
-source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
+```
 
-# Installer les dépendances (après checkout d'une branche avec requirements.txt)
+**Explication :**
+- `python -m venv` : module intégré à Python 3.3+
+- `.venv` : nom du dossier (convention, peut être `venv`, `env`, etc.)
+
+### 2. Activer l'environnement
+
+**Sur Linux/Mac :**
+```bash
+source .venv/bin/activate
+```
+
+**Sur Windows :**
+```powershell
+.venv\Scripts\activate
+```
+
+**Vérification :**
+Votre prompt devrait afficher `(.venv)` au début :
+```bash
+(.venv) user@machine:~/project$
+```
+
+### 3. Installer les dépendances
+
+```bash
 pip install -r requirements.txt
 ```
 
-## Guide d'utilisation
+**Ce qui se passe :**
+- Pip lit `requirements.txt`
+- Télécharge les packages depuis PyPI
+- Les installe dans `.venv/lib/python3.x/site-packages/`
 
-### Naviguer entre les étapes
+### 4. Vérifier l'installation
 
 ```bash
-# Voir toutes les branches disponibles
-git branch -a
-
-# Passer à une étape spécifique
-git checkout step-01-structure
-
-# Voir les différences entre deux étapes
-git diff step-01-structure..step-02-dependencies
+pip list
 ```
 
-### Workflow recommandé
+Vous devriez voir :
+```
+Package    Version
+---------- -------
+click      8.1.7
+rich       13.7.0
+...
+```
 
-1. **Checkout** de la branche de l'étape
-2. **Lire** le README de cette étape
-3. **Reproduire** le code dans votre propre branche
-4. **Tester** que ça fonctionne
-5. **Commit** vos changements
-6. **Passer** à l'étape suivante
+### 5. Tester Rich en Python
 
-## Pour les formateurs
+```python
+python
+>>> from rich.console import Console
+>>> console = Console()
+>>> console.print("[bold green]Success![/bold green]")
+```
 
-### Structure pédagogique
+Vous devriez voir du texte vert et gras !
 
-- **Durée totale:** 2h30
-- **Format:** Démonstration → Pratique → Validation
-- **Rythme:** 15-20 min par étape
+## Le fichier requirements.txt
 
-### Plan détaillé
+### Format
 
-Voir [masterclass_plan.md](./docs/masterclass_plan.md) pour le contenu de chaque phase.
+```txt
+package==version  # Version exacte (recommandé pour la prod)
+package>=version  # Version minimum
+package~=version  # Version compatible
+```
 
-## Technologies utilisées
+**Notre choix :** Versions exactes pour la reproductibilité.
 
-- **Python 3.10+** - Langage de programmation
-- **Rich** - Affichage stylé dans le terminal
-- **Click** - Framework pour créer des CLI
-- **Ruff** - Linter et formatteur ultra-rapide
-- **pytest** - Framework de tests
-- **Git** - Gestion de versions
+### Générer requirements.txt
 
-## Ressources
+Si vous avez installé des packages manuellement :
+```bash
+pip freeze > requirements.txt
+```
 
-- [Documentation Ruff](https://docs.astral.sh/ruff/)
-- [Guide pytest](https://docs.pytest.org/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Real Python - Project Structure](https://realpython.com/python-application-layouts/)
+⚠️ **Attention :** `pip freeze` liste TOUS les packages, y compris les dépendances transitives. Pour un projet propre, listez manuellement uniquement vos dépendances directes.
 
-## Contribution
+### requirements-dev.txt (bonus)
 
-Ce projet est un support pédagogique. Les suggestions d'amélioration sont les bienvenues via issues ou PR !
+On peut séparer les dépendances :
 
-## Licence
+**requirements.txt :** Production uniquement
+```txt
+rich==13.7.0
+click==8.1.7
+```
 
-MIT - Libre d'utilisation pour l'éducation et la formation.
+**requirements-dev.txt :** Développement + Production
+```txt
+-r requirements.txt  # Inclut requirements.txt
+pytest==7.4.3
+ruff==0.1.9
+```
 
-**Bon workshop !**
+Installation dev :
+```bash
+pip install -r requirements-dev.txt
+```
+
+## Préparation à Docker
+
+Cette approche avec `requirements.txt` est exactement ce qu'on fera dans Docker :
+
+```dockerfile
+# Dockerfile (aperçu du Sprint 5)
+FROM python:3.11-slim
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY src/ ./src/
+```
+
+## Bonnes pratiques
+
+### À faire
+- Toujours activer le venv avant de travailler
+- Commiter `requirements.txt`
+- Mettre `.venv/` dans `.gitignore`
+- Documenter les dépendances système si nécessaires
+
+### À éviter
+- Commiter le dossier `.venv/` (il est déjà dans `.gitignore`)
+- Installer des packages globalement
+- Mélanger venv et système
+- Oublier d'activer le venv
+
+## Concepts avancés
+
+### pyproject.toml (aperçu)
+
+Format moderne pour gérer les dépendances :
+
+```toml
+[project]
+name = "task-manager"
+version = "0.1.0"
+dependencies = [
+    "rich>=13.7.0",
+    "click>=8.1.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "ruff>=0.1.9",
+]
+```
+
+Utilisé avec des outils comme Poetry, PDM, ou Hatch.
+
+**Pour ce workshop :** On reste sur `requirements.txt` (plus simple, universel).
+
+### Alternatives à venv
+
+- **virtualenv :** Ancêtre de venv, plus de fonctionnalités
+- **conda :** Environnements avec packages non-Python (NumPy, ML)
+- **pipenv :** Combine pip + venv
+- **poetry :** Gestion moderne de dépendances
+
+**Pour ce workshop :** `venv` est intégré à Python, suffisant pour 90% des cas.
+
+## Points de validation
+
+- [ ] `.venv/` créé et activé
+- [ ] `requirements.txt` créé avec rich et click
+- [ ] Packages installés avec succès
+- [ ] Test d'import de Rich fonctionne
+- [ ] `.venv/` bien ignoré par Git
+
+## Petit défi
+
+Testez cette commande pour voir la puissance de Rich :
+
+```python
+from rich.progress import track
+import time
+
+for i in track(range(20), description="Processing..."):
+    time.sleep(0.1)
+```
+
+Vous devriez voir une progress bar !
+
+## Commit
+
+```bash
+git add requirements.txt STEP_02_README.md
+git commit -m "feat: add project dependencies (rich, click)"
+```
+
+**Note :** On ne commit pas `.venv/` car il est dans `.gitignore`.
+
+## Prochaine étape
+
+→ **Step 03: Implémentation des classes**
+
+Vous allez créer les classes `Task` et `TaskManager` avec de la vraie POO.
