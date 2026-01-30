@@ -1,173 +1,82 @@
-# Step 07: CLI avec Rich et Click
+# Step 08: Tests et Intégration Continue (CI)
 
 ## Objectif
 
-Créer une interface en ligne de commande interactive et professionnelle pour notre Task Manager.
+Apprendre à valider la qualité du code avec des tests unitaires et à automatiser ces vérifications avec GitHub Actions.
 
 ## Installation des dépendances
 
 ```bash
-# Avec UV (recommandé)
+# Installer pytest et pytest-cov avec UV
 uv sync
-
-# Ou méthode classique
-python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 ```
 
+## 🧪 Tests unitaires avec Pytest
 
-## Architecture finale
-
+### Structure des tests
 ```
-src/
-├── models/
-│   └── task.py          # Modèle Task et TaskStatus
-├── services/
-│   └── task_manager.py  # Logique métier TaskManager
-└── cli/
-    └── main.py          # Interface CLI avec Rich/Click
+tests/
+├── __init__.py
+├── test_task.py          # Tests du modèle Task
+└── test_task_manager.py  # Tests de la logique TaskManager
 ```
 
-## Rich vs Click
-
-| Composant | Rôle | Exemple |
-|-----------|------|---------|
-| **Rich** | Affichage stylé | Tableaux, couleurs, progress bars |
-| **Click** | Structure CLI | Commandes, arguments, options |
-
-Les deux travaillent ensemble :
-- Click structure la commande (`add`, `list`, etc.)
-- Rich rend l'affichage beau et lisible
-
-## Commandes de la CLI
+### Exécuter les tests
 
 ```bash
-# Ajouter une tâche
-uv run python -m src.cli.main add "Apprendre Python" "Compléter le workshop"
+# Lancer tous les tests
+uv run pytest
 
-# Lister toutes les tâches
-uv run python -m src.cli.main list
-
-# Lister les tâches par statut
-uv run python -m src.cli.main list --status todo
-uv run python -m src.cli.main list --status done
-
-# Mettre à jour le statut d'une tâche
-uv run python -m src.cli.main update 1 done
-uv run python -m src.cli.main update 1 in_progress
-
-# Supprimer une tâche
-uv run python -m src.cli.main delete 1
-
-# Voir les statistiques
-uv run python -m src.cli.main stats
+# Lancer avec le rapport de couverture (coverage)
+uv run pytest --cov=src tests/
 ```
 
-### Structure du code (cli/main.py)
+### Pourquoi tester ?
+- **Confiance** : Vérifier que le code fait ce qu'on attend.
+- **Non-régression** : S'assurer qu'une modification ne casse pas l'existant.
+- **Documentation** : Les tests servent d'exemple d'utilisation.
 
-```python
-import click
-from rich.console import Console
-from rich.table import Table
-from src.services.task_manager import TaskManager
+## 🚀 GitHub Actions (CI)
 
-console = Console()
-manager = TaskManager()
+Le fichier `.github/workflows/ci.yml` automatise les vérifications à chaque `push` ou `pull request`.
 
-@click.group()
-def cli():
-    """Task Manager CLI"""
-    pass
+### Workflow automatisé :
+1. **Linting** : Vérification du style avec Ruff.
+2. **Formatting** : Vérification du formatage avec Ruff.
+3. **Tests** : Exécution de tous les tests unitaires.
 
-@cli.command()
-@click.argument('title')
-@click.argument('description')
-def add(title: str, description: str):
-    """Add a new task"""
-    task = manager.add_task(title, description)
-    console.print(f"[green]Task created:[/green] {task.title}")
-
-@cli.command()
-def list():
-    """List all tasks"""
-    tasks = manager.list_tasks()
-    
-    table = Table(title="Tasks")
-    table.add_column("ID", style="cyan")
-    table.add_column("Title", style="magenta")
-    table.add_column("Status", style="green")
-    
-    for task in tasks:
-        table.add_row(str(task.id), task.title, task.status.value)
-    
-    console.print(table)
-
-if __name__ == "__main__":
-    cli()
-```
+### Avantages de la CI :
+- **Qualité garantie** : On ne merge que du code qui passe les tests.
+- **Feedback rapide** : On sait immédiatement si on a cassé quelque chose.
 
 ## À reproduire
 
-### 1. Créer le fichier CLI
-
+### 1. Créer le dossier de tests
 ```bash
-touch src/cli/main.py
+mkdir tests
+touch tests/__init__.py tests/test_task.py tests/test_task_manager.py
 ```
 
-### 2. Implémenter les commandes de base
+### 2. Écrire vos tests
+Utilisez `pytest.fixture` pour préparer un environnement de test propre (ex: un `TaskManager` vide).
 
-- `add` : Ajouter une tâche
-- `list` : Lister les tâches (avec filtrage par statut)
-- `update` : Mettre à jour le statut d'une tâche
-- `delete` : Supprimer une tâche
-- `stats` : Afficher les statistiques
-
-### 3. Persistance automatique
-
-**Les tâches sont sauvegardées automatiquement dans `tasks.json` !**
-
-Vos tâches persistent entre les exécutions grâce à la sauvegarde JSON.
-
-### 4. Tester l'interface
-
-```bash
-# Ajouter une tâche
-uv run python -m src.cli.main add "Apprendre Python" "Compléter le workshop"
-
-# Lister - la tâche est toujours là !
-uv run python -m src.cli.main list
-
-# Ajouter une autre tâche
-uv run python -m src.cli.main add "Build API" "Créer une API REST"
-
-# Lister à nouveau - les deux tâches sont là
-uv run python -m src.cli.main list
-```
-
-### 5. Améliorations optionnelles
-
-- Filtrage par statut
-- Recherche dans les titres
-- Export vers JSON/CSV
-- Commandes d'aide détaillées
-- Mode interactif
+### 3. Configurer la CI
+Créez le fichier `.github/workflows/ci.yml` pour automatiser vos tests sur GitHub.
 
 ## Points de validation
 
-- [ ] `src/cli/main.py` créé avec structure Click
-- [ ] Commandes `add` et `list` fonctionnelles
-- [ ] Tableau Rich s'affiche correctement
-- [ ] CLI peut être lancée avec `python -m src.cli.main`
-- [ ] Messages d'erreur clairs
+- [ ] `uv run pytest` passe au vert (all tests passed)
+- [ ] La couverture de code est satisfaisante
+- [ ] Le workflow GitHub Actions est configuré
+- [ ] Ruff est intégré dans la CI
 
 ## Commit
 
 ```bash
-git add src/cli/main.py
-git commit -m "feat: add CLI interface with Rich and Click"
+git add .
+git commit -m "feat: add unit tests and GitHub Actions CI"
 ```
 
 ## Prochaine étape
 
-→ **Step 08: Tests unitaires avec pytest**
-
-Vous allez écrire des tests pour valider le fonctionnement de votre Task Manager.
+Félicitations ! Vous avez terminé le workshop. Votre projet est maintenant professionnel, testé et automatisé.
