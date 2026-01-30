@@ -4,6 +4,16 @@
 
 Implémenter les classes `Task` et `TaskManager` en appliquant les principes de la POO.
 
+## Installation des dépendances
+
+```bash
+# Avec UV (recommandé)
+uv sync
+
+# Ou méthode classique
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+```
+
 ## Architecture
 
 ```
