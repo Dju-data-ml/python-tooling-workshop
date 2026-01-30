@@ -46,7 +46,18 @@ git diff step-01-structure..step-02-dependencies
 
 - Python 3.10+
 - Git
+- [UV](https://docs.astral.sh/uv/) (recommandé) ou pip/venv
 - Un éditeur de code (VSCode recommandé)
+
+### Installation des dépendances (à partir de step-02)
+
+```bash
+# Avec UV (recommandé)
+uv sync
+
+# Ou méthode classique
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+```
 
 ### Pour les formateurs
 
