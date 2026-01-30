@@ -1,35 +1,27 @@
 # Masterclass: Toolings & Python Best Practices
 ## Formation ML Engineer - Sprint 1, Jour 7
 
-**Durée:** 2h  
 **Format:** Workshop interactif avec live coding  
 **Objectif:** Donner aux apprenants les outils et pratiques pour écrire du code Python production-ready
 
----
+## Objectifs pédagogiques
 
-## 🎯 Objectifs pédagogiques
-
-À la fin de cette masterclass, les apprenants sauront:
+À la fin de cette masterclass, les apprenants doivent pouvoir:
 1. Structurer un projet Python modulaire et maintenable
 2. Utiliser les outils modernes de qualité de code (linting, formatting)
 3. Gérer proprement les dépendances et environnements virtuels
 4. Appliquer un workflow Git professionnel avec branches et PRs
 5. Comprendre la différence entre du code "exploration" et du code "production"
 
----
-
-## 📋 Prérequis
+## Prérequis
 
 - Compte GitHub créé
 - Notions de base Python (Sprint 1 complété)
 - Accès à GitHub Codespaces
 
----
+## Programme détaillé
 
-## 🕐 Programme détaillé
-
-### Phase 0: Introduction (10 min)
-**Timing:** 0:00 - 0:10
+### Phase 0: Introduction
 
 **Contenu:**
 - Présentation du contexte: "Pourquoi on ne code pas en production comme dans un notebook?"
@@ -42,14 +34,11 @@
 - Lancent leur Codespace
 - Vérifient que l'environnement fonctionne
 
----
-
-### Phase 1: Structure de projet Python (25 min)
-**Timing:** 0:10 - 0:35
+### Phase 1: Structure de projet Python
 
 **Objectif:** Comprendre comment organiser du code Python modulaire
 
-**Démonstration live (10 min):**
+**Démonstration live:**
 ```
 project/
 ├── README.md
@@ -77,7 +66,7 @@ project/
 - `if __name__ == "__main__":` vs code importable
 - `.gitignore` adapté à Python
 
-**Pratique (15 min):**
+**Pratique:**
 - Checkout de `step-01-structure`
 - Les apprenants reproduisent la structure
 - Créent les fichiers vides
@@ -88,14 +77,11 @@ project/
 - Montrer comment importer depuis `src.models.task`
 - Insister sur le fait que cette structure sera réutilisée dans Docker, FastAPI, etc.
 
----
-
-### Phase 2: Environnements virtuels et dépendances (20 min)
-**Timing:** 0:35 - 0:55
+### Phase 2: Environnements virtuels et dépendances
 
 **Objectif:** Gérer proprement les dépendances Python
 
-**Démonstration live (10 min):**
+**Démonstration live:**
 
 1. **Création d'un venv:**
 ```bash
@@ -114,7 +100,7 @@ pip freeze > requirements.txt
    - Reproductibilité
    - Préparation à Docker
 
-**Pratique (10 min):**
+**Pratique:**
 - Checkout de `step-02-dependencies`
 - Création de leur venv
 - Installation des dépendances du projet (rich pour CLI stylé, click pour arguments)
@@ -125,14 +111,11 @@ pip freeze > requirements.txt
 - Pourquoi le venv n'est pas commité (`.gitignore`)
 - Comment quelqu'un d'autre reproduit l'environnement
 
----
-
-### Phase 3: Code fonctionnel (20 min)
-**Timing:** 0:55 - 1:15
+### Phase 3: Code fonctionnel
 
 **Objectif:** Implémenter les classes de base avec la POO
 
-**Démonstration live (10 min):**
+**Démonstration live:**
 
 **`src/models/task.py`:**
 ```python
@@ -176,25 +159,19 @@ class TaskManager:
         pass
 ```
 
-**Pratique (10 min):**
+**Pratique:**
 - Checkout de `step-03-implementation`
 - Implémentation des méthodes
 - Test manuel dans Python REPL
 - Commit: "feat: implement Task and TaskManager"
 
----
+### PAUSE
 
-### 🍕 PAUSE (10 min)
-**Timing:** 1:15 - 1:25
-
----
-
-### Phase 4: Linting et qualité de code (20 min)
-**Timing:** 1:25 - 1:45
+### Phase 4: Linting et qualité de code
 
 **Objectif:** Détecter automatiquement les problèmes de code
 
-**Démonstration live (10 min):**
+**Démonstration live:**
 
 1. **Installation de Ruff:**
 ```bash
@@ -224,7 +201,7 @@ ruff check --fix src/  # Auto-fix
 - Auto-fix vs erreurs à corriger manuellement
 - Configuration de projet vs configuration personnelle
 
-**Pratique (10 min):**
+**Pratique:**
 - Checkout de `step-04-linting`
 - Ajout du fichier `pyproject.toml`
 - Lancement du linter sur leur code
@@ -235,14 +212,11 @@ ruff check --fix src/  # Auto-fix
 - Montrer VSCode extension Ruff (linting en temps réel)
 - Shortcuts pour auto-fix
 
----
-
-### Phase 5: Formatage automatique (15 min)
-**Timing:** 1:45 - 2:00
+### Phase 5: Formatage automatique
 
 **Objectif:** Uniformiser le style de code automatiquement
 
-**Démonstration live (7 min):**
+**Démonstration live:**
 
 1. **Ruff comme formatteur:**
 ```bash
@@ -261,7 +235,7 @@ indent-style = "space"
    - Lancer `ruff format`
    - Constater les changements automatiques
 
-**Pratique (8 min):**
+**Pratique:**
 - Checkout de `step-05-formatting`
 - Désorganiser volontairement le formatage de leur code
 - Lancer le formatteur
@@ -273,14 +247,11 @@ indent-style = "space"
 - Pourquoi le formatage auto évite les débats stériles
 - Intégration dans l'éditeur (format on save)
 
----
-
-### Phase 6: Git workflow professionnel (20 min)
-**Timing:** 2:00 - 2:20
+### Phase 6: Git workflow professionnel
 
 **Objectif:** Appliquer un workflow Git réaliste avec branches et PR
 
-**Démonstration live (10 min):**
+**Démonstration live:**
 
 1. **Workflow de feature branch:**
 ```bash
@@ -304,7 +275,7 @@ git push origin feature/add-delete-task
    - `docs:` pour documentation
    - `style:` pour formatage
 
-**Pratique (10 min):**
+**Pratique:**
 - Checkout de `step-06-git-workflow`
 - Créer une branche pour une nouvelle feature (ex: filtrer par statut)
 - Implémenter la feature
@@ -318,14 +289,11 @@ git push origin feature/add-delete-task
 - L'importance des messages de commit clairs
 - Préparation au GitFlow (Sprint 6)
 
----
-
-### Phase 7: CLI et point d'entrée (15 min)
-**Timing:** 2:20 - 2:35
+### Phase 7: CLI et point d'entrée
 
 **Objectif:** Créer une interface utilisateur en ligne de commande
 
-**Démonstration live (8 min):**
+**Démonstration live:**
 
 **`src/cli/main.py`:**
 ```python
@@ -348,7 +316,7 @@ def cli():
 def add(title: str, description: str):
     """Add a new task"""
     task = manager.add_task(title, description)
-    console.print(f"[green]✓[/green] Task created: {task.title}")
+    console.print(f"[green]Task created:[/green] {task.title}")
 
 @cli.command()
 def list():
@@ -369,20 +337,17 @@ if __name__ == "__main__":
     cli()
 ```
 
-**Pratique (7 min):**
+**Pratique:**
 - Checkout de `step-07-cli`
 - Implémentation du CLI
 - Test: `python -m src.cli.main add "Learn Python" "Complete masterclass"`
 - Commit: "feat: add CLI interface"
 
----
-
-### Phase 8: Tests unitaires (optionnel si temps) (15 min)
-**Timing:** 2:35 - 2:50
+### Phase 8: Tests unitaires (optionnel si temps)
 
 **Objectif:** Introduire pytest pour valider le code
 
-**Démonstration live (7 min):**
+**Démonstration live:**
 
 **`tests/test_task_manager.py`:**
 ```python
@@ -413,16 +378,13 @@ pip install pytest
 pytest tests/ -v
 ```
 
-**Pratique (8 min):**
+**Pratique:**
 - Checkout de `step-08-tests`
 - Écrire 2-3 tests simples
 - Lancer pytest
 - Commit: "test: add unit tests for TaskManager"
 
----
-
-### Conclusion et ressources (10 min)
-**Timing:** 2:50 - 3:00 (débordement acceptable)
+### Conclusion et ressources
 
 **Récapitulatif:**
 - Ce qu'on a vu: structure, dépendances, qualité, Git, CLI, tests
@@ -444,40 +406,34 @@ pytest tests/ -v
 - Le repo template est disponible pour leurs futurs projets
 - Questions/Réponses
 
----
+## Livrables
 
-## 📦 Livrables
+**Pour les apprenants:**
+- Repo GitHub forké avec toutes les branches
+- Projet fonctionnel sur leur Codespace
+- Au moins 1 PR créée et mergée
+- Environnement configuré (linting + formatting)
 
-Pour les apprenants:
-- [ ] Repo GitHub forké avec toutes les branches
-- [ ] Projet fonctionnel sur leur Codespace
-- [ ] Au moins 1 PR créée et mergée
-- [ ] Environnement configuré (linting + formatting)
-
----
-
-## 🎓 Points d'attention formateur
+## Points d'attention formateur
 
 **Pièges classiques:**
-- Oublier d'activer le venv → imports qui échouent
-- Confusion entre `src.models` et `models` dans les imports
-- Commits trop gros ou messages vagues
-- Ne pas tester le code avant de commit
+- Oublier d'activer le venv, ce qui fait échouer les imports
+- Confondre `src.models` et `models` dans les imports
+- Faire des commits trop gros ou avec des messages vagues
+- Ne pas tester le code avant de commiter
 
 **Adaptations possibles:**
-- Si le groupe est rapide: ajouter la phase tests
-- Si le groupe est lent: skipper le CLI et rester sur REPL
-- Si problèmes techniques: avoir un Codespace de secours déjà configuré
+- Si le groupe est rapide: ajouter la phase sur les tests
+- Si le groupe est lent: sauter le CLI et rester sur le REPL
+- En cas de problèmes techniques: avoir un Codespace de secours déjà configuré
 
 **Énergie de la séance:**
-- Alterner démo/pratique pour maintenir l'attention
-- Faire des breaks de 2-3 min entre chaque phase si besoin
-- Encourager l'entraide entre apprenants
-- Ne pas hésiter à débugger en live (c'est formateur)
+- Alterner démos et pratique pour maintenir l'attention
+- Faire des pauses de 2-3 minutes entre chaque phase si nécessaire
+- Encourager l'entraide entre les apprenants
+- Débugger en direct quand c'est nécessaire - c'est formateur
 
----
-
-## 🔗 Liens utiles
+## Liens utiles
 
 - Repo du workshop: `https://github.com/[username]/python-tooling-workshop`
 - Documentation du projet: voir README.md du repo
